@@ -1,0 +1,72 @@
+item.itemRoughStone.name=Rough Stone
+item.itemCoarseStone.name=Coarse Stone
+item.itemSolidStone.name=Solid Stone
+item.itemDenseStone.name=Dense Stone
+
+item.itemMalachiteGem.name=§aMalachite§r
+item.itemTigerseyeGem.name=§aTigerseye§r
+item.itemShadowgemGem.name=§aShadowgem§r
+item.itemMossagateGem.name=§aMoss Agate§r
+item.itemLesserMoonstoneGem.name=§aLesser Moonstone§r
+item.itemJadeGem.name=§aJade§r
+item.itemCitrineGem.name=§aCitrine§r
+item.itemAquamarineGem.name=§aAquamarine§r
+item.itemStarRubyGem.name=§aStar Ruby§r
+item.itemBlackVitriolGem.name=Black Vitriol
+item.itemArcaneCrystalGem.name=§aArcane Crystal§r
+item.itemBlueSapphireGem.name=§aBlue Sapphire§r
+item.itemLargeOpalGem.name=§aLarge Opal§r
+item.itemBloodOfTheMountainGem.name=§aBlood of the Mountain§r
+item.itemBlackDiamondGem.name=§aBlack Diamond§r
+
+item.itemCopperOre.name=Copper Ore
+item.itemTinOre.name=Tin Ore
+item.itemSilverOre.name=§aSilver Ore§r
+item.itemMithrilOre.name=Mithril Ore
+item.itemThoriumOre.name=Thorium Ore
+item.itemTruesilverOre.name=§aTruesilver Ore§r
+item.itemDarkIronOre.name=Dark Iron Ore
+item.itemFelIronOre.name=Fel Iron Ore
+
+item.itemCopperBar.name=Copper Bar
+item.itemTinBar.name=Tin Bar
+item.itemBronzeBar.name=Bronze Bar
+item.itemSilverBar.name=§aSilver Bar§r
+item.itemMithrilBar.name=Mithril Bar
+item.itemThoriumBar.name=Thorium Bar
+item.itemTruesilverBar.name=§aTruesilver Bar§r
+item.itemDarkIronBar.name=Dark Iron Bar
+item.itemFelIronBar.name=Fel Iron Bar
+
+item.itemCopperNugget.name=Copper Nugget
+item.itemTinNugget.name=Tin Nugget
+item.itemBronzeNugget.name=Bronze Nugget
+item.itemSilverNugget.name=§aSilver Nugget§r
+item.itemMithrilNugget.name=Mithril Nugget
+item.itemThoriumNugget.name=Thorium Nugget
+item.itemTruesilverNugget.name=§aTruesilver Nugget§r
+item.itemDarkIronNugget.name=Dark Iron Nugget
+item.itemFelIronNugget.name=Fel Iron Nugget
+
+item.itemRoughBlastingPowder.name=Rough Blasting Powder
+item.itemCoarseBlastingPowder.name=Coarse Blasting Powder
+item.itemSolidBlastingPowder.name=Solid Blasting Powder
+item.itemDenseBlastingPowder.name=Dense Blasting Powder
+
+item.itemInertStone.name=Inert Stone
+item.itemPhilosophersStone.name=§aPhilosopher's Stone§r
+item.itemWarcraftPickaxe.name=Warcraft Pickaxe
+
+tile.blockCopperOre.name=Copper Ore
+tile.blockTinOre.name=Tin Ore
+tile.blockSilverOre.name=§aSilver Ore§r
+tile.blockMithrilOre.name=Mithril Ore
+tile.blockThoriumOre.name=Thorium Ore
+tile.blockTruesilverOre.name=§aTruesilver Ore§r
+tile.blockDarkIronOre.name=Dark Iron Ore
+tile.blockFelIronOre.name=Fel Iron Ore
+
+tile.blockFirebloomFlower.name=Firebloom
+tile.blockPurpleLotusFlower.name=Purple Lotus
+
+itemGroup.tabWom=World of Minecraft
