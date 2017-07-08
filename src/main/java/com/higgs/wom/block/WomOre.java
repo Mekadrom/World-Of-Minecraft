@@ -41,7 +41,7 @@ public class WomOre extends Block
 
 		if(player.getCurrentEquippedItem() != null)
 		{
-			if(Item.getIdFromItem(player.getCurrentEquippedItem().getItem()) == Item.getIdFromItem(WomItems.itemWarcraftPickaxe))
+			if(Item.getIdFromItem(player.getCurrentEquippedItem().getItem()) == Item.getIdFromItem(WomItems.itemMinersPick))
 			{
 				hasPickaxe = true;
 			}

@@ -20,7 +20,7 @@ public final class WomItems
 	public static Item itemMalachiteGem;
 	public static Item itemTigerseyeGem;
 	public static Item itemShadowgemGem;
-	public static Item itemMossagateGem;
+	public static Item itemMossAgateGem;
 	public static Item itemLesserMoonstoneGem;
 	public static Item itemJadeGem;
 	public static Item itemCitrineGem;
@@ -91,7 +91,7 @@ public final class WomItems
 	public static Item itemInertStone;
 	public static Item itemPhilosophersStone;
 	public static Item itemEluneStone;
-	public static Item itemWarcraftPickaxe;
+	public static Item itemMinersPick;
 	
 	public static final void init()
 	{
@@ -108,7 +108,7 @@ public final class WomItems
 		GameRegistry.registerItem(itemMalachiteGem = new WomItem().setUnlocalizedName("itemMalachiteGem").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemMalachiteGem"), "itemMalachiteGem");
 		GameRegistry.registerItem(itemTigerseyeGem = new WomItem().setUnlocalizedName("itemTigerseyeGem").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemTigerseyeGem"), "itemShadowgemGem");
 		GameRegistry.registerItem(itemShadowgemGem = new WomItem().setUnlocalizedName("itemShadowgemGem").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemShadowgemGem"), "itemTigerseyeGem");
-		GameRegistry.registerItem(itemMossagateGem = new WomItem().setUnlocalizedName("itemMossagateGem").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemMossagateGem"), "itemMossagateGem");
+		GameRegistry.registerItem(itemMossAgateGem = new WomItem().setUnlocalizedName("itemMossAgateGem").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemMossAgateGem"), "itemMossAgateGem");
 		GameRegistry.registerItem(itemLesserMoonstoneGem = new WomItem().setUnlocalizedName("itemLesserMoonstoneGem").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemLesserMoonstoneGem"), "itemLesserMoonstoneGem");
 		GameRegistry.registerItem(itemJadeGem = new WomItem().setUnlocalizedName("itemJadeGem").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemJadeGem"), "itemJadeGem");
 		GameRegistry.registerItem(itemCitrineGem = new WomItem().setUnlocalizedName("itemCitrineGem").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemCitrineGem"), "itemCitrineGem");
@@ -179,6 +179,6 @@ public final class WomItems
 		GameRegistry.registerItem(itemInertStone = new WomItem().setUnlocalizedName("itemInertStone").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemInertStone"), "itemInertStone");
 		GameRegistry.registerItem(itemPhilosophersStone = new WomItem().setUnlocalizedName("itemPhilosophersStone").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemPhilosophersStone").setMaxStackSize(1), "itemPhilosophersStone");
 		GameRegistry.registerItem(itemEluneStone = new WomItem().setUnlocalizedName("itemEluneStone").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemEluneStone").setMaxStackSize(64), "itemEluneStone");
-		GameRegistry.registerItem(itemWarcraftPickaxe = new WomItem().setUnlocalizedName("itemWarcraftPickaxe").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemWarcraftPickaxe").setMaxStackSize(1), "itemWarcraftPickaxe");
+		GameRegistry.registerItem(itemMinersPick = new WomItem().setUnlocalizedName("itemMinersPick").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemMinersPick").setMaxStackSize(1), "itemMinersPick");
 	}
 }
