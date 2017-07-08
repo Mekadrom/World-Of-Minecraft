@@ -42,11 +42,12 @@ public class WomEventHandlerCommon
 //	    {
 //	    	e.entity.registerExtendedProperties("womPlayerData", new WomPlayerData((EntityPlayer)e.entity));
 //	    }
-		
+
 		if(e.entity instanceof EntityPlayerMP)
 		{
-			WomPlayerData.get((EntityPlayer)e.entity).loadNBTData(new NBTTagCompound());
-			HiggsWom.network.sendTo(new WomPacketSyncPlayerData((EntityPlayer)e.entity), (EntityPlayerMP) e.entity);
+			final EntityPlayerMP entity = (EntityPlayerMP)e.entity;
+			WomPlayerData.get(entity).loadNBTData(new NBTTagCompound());
+			HiggsWom.network.sendTo(new WomPacketSyncPlayerData(entity), entity);
 		}
 	}
 	

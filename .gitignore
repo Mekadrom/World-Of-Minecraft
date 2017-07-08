@@ -25,6 +25,7 @@ hs_err_pid*
 .git
 .idea
 .settings
+/.gradle
 /asm
 /bin
 /blueprints
@@ -35,6 +36,7 @@ hs_err_pid*
 /imcScripts
 /logs
 /mods
+/out
 /resourcepacks
 /saves
 /screenshots
@@ -44,3 +46,4 @@ options.txt
 eula.txt
 minetweaker.log
 servers.dat
+
