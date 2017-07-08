@@ -20,6 +20,7 @@ public class WomPacketSyncPlayerData extends AbstractClientMessage<WomPacketSync
 {
     private NBTTagCompound data;
     protected EntityPlayer entityPlayer;
+    private int miningSkill;
     private int worldId;
     private int playerId;
 
@@ -38,6 +39,7 @@ public class WomPacketSyncPlayerData extends AbstractClientMessage<WomPacketSync
     {
         this.worldId = player.dimension;
         this.playerId = player.getEntityId();
+        this.entityPlayer = player;
 		// create a new tag compound
 		data = new NBTTagCompound();
 		// and save our player's data into it
