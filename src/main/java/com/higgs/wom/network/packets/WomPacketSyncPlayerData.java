@@ -19,11 +19,13 @@ import net.minecraft.network.PacketBuffer;
 public class WomPacketSyncPlayerData extends AbstractClientMessage<WomPacketSyncPlayerData> implements IMessage
 {
     private NBTTagCompound data;
+    protected EntityPlayer entityPlayer;
 
     public WomPacketSyncPlayerData() { }
 
     public WomPacketSyncPlayerData(WomPlayerData playerData)
     {
+        this.entityPlayer = playerData.getPlayerRef();
         this.data = new NBTTagCompound();
         playerData.saveNBTData(this.data);
     }
@@ -63,10 +65,16 @@ public class WomPacketSyncPlayerData extends AbstractClientMessage<WomPacketSync
     	@Override
     	public final IMessage onMessage(WomPacketSyncPlayerData msg, MessageContext ctx)
     	{
-    		EntityPlayerMP serverPlayer = ctx.getServerHandler().playerEntity;
+    		EntityPlayer serverPlayer = msg.entityPlayer;
 
-    		WomPlayerData.get(serverPlayer).loadNBTData(new NBTTagCompound());
-    		
+    		if(serverPlayer != null)
+    		{
+                if (WomPlayerData.get(serverPlayer) != null)
+                {
+                    WomPlayerData.get(serverPlayer).loadNBTData(new NBTTagCompound());
+                }
+            }
+
     		return null;
     	}
     	

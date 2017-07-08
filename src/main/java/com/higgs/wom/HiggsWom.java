@@ -5,7 +5,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.higgs.wom.item.WomItems;
-import com.higgs.wom.network.packets.WomPacketMiningCheck;
 import com.higgs.wom.network.packets.WomPacketMiningLevel;
 import com.higgs.wom.network.packets.WomPacketSyncPlayerData;
 import com.higgs.wom.proxy.CommonProxy;
@@ -127,10 +126,8 @@ public class HiggsWom
     	
     	network.registerMessage(WomPacketMiningLevel.Handler.class, WomPacketMiningLevel.class, 0, Side.SERVER);
     	network.registerMessage(WomPacketMiningLevel.Handler.class, WomPacketMiningLevel.class, 1, Side.CLIENT);
-    	network.registerMessage(WomPacketMiningCheck.Handler.class, WomPacketMiningCheck.class, 2, Side.SERVER);
-    	network.registerMessage(WomPacketMiningCheck.Handler.class, WomPacketMiningCheck.class, 3, Side.CLIENT);
-    	network.registerMessage(WomPacketSyncPlayerData.Handler.class, WomPacketSyncPlayerData.class, 4, Side.SERVER);
-//    	network.registerMessage(WomPacketSyncPlayerData.Handler.class, WomPacketSyncPlayerData.class, 5, Side.CLIENT);
+    	network.registerMessage(WomPacketSyncPlayerData.Handler.class, WomPacketSyncPlayerData.class, 2, Side.SERVER);
+    	network.registerMessage(WomPacketSyncPlayerData.Handler.class, WomPacketSyncPlayerData.class, 3, Side.CLIENT);
     	
     	config = new Configuration(e.getSuggestedConfigurationFile());
     	

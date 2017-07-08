@@ -1,7 +1,6 @@
 package com.higgs.wom.entitydata;
 
 import com.higgs.wom.HiggsWom;
-import com.higgs.wom.network.packets.WomPacketMiningCheck;
 import com.higgs.wom.network.packets.WomPacketMiningLevel;
 import com.higgs.wom.network.packets.WomPacketSyncPlayerData;
 
@@ -15,7 +14,7 @@ import net.minecraftforge.common.IExtendedEntityProperties;
 public class WomPlayerData implements IExtendedEntityProperties
 {
 	private final EntityPlayer player;
-	private static final String identifier = "womPlayerData";
+	public static final String identifier = "womPlayerData";
 	private int mana;
 	private boolean mining;// = false;
 	private int miningSkill;// = 0;
@@ -24,7 +23,6 @@ public class WomPlayerData implements IExtendedEntityProperties
 	{
 		this.player = player;
 		this.mana = 100;
-		this.mining = false;
 		this.miningSkill = 0;
 	}
 	
@@ -32,11 +30,15 @@ public class WomPlayerData implements IExtendedEntityProperties
 	{
 	    return (WomPlayerData) player.getExtendedProperties(identifier);
 	}
-	
+
+	public EntityPlayer getPlayerRef()
+	{
+		return this.player;
+	}
+
 	public void copy(WomPlayerData data)
 	{
 		this.mana = data.getMana();
-		this.mining = data.getHasMining();
 		this.miningSkill = data.getMiningSkill();
 	}
 
@@ -59,17 +61,12 @@ public class WomPlayerData implements IExtendedEntityProperties
 	{
 	    return this.mana;
 	}
-	
+
 	public boolean getHasMining()
 	{
-		return this.mining;
+		return this.miningSkill == 1;
 	}
-	
-	public void setHasMining(boolean has)
-	{
-		this.mining = has;
-	}
-	
+
 	public int getMiningSkill()
 	{
 		return this.miningSkill;
@@ -96,19 +93,7 @@ public class WomPlayerData implements IExtendedEntityProperties
 	    	HiggsWom.network.sendTo(new WomPacketMiningLevel(this.player, this.getMiningSkill()), (EntityPlayerMP)this.player);
 	    }
 	}
-	
-	public void syncHasMining()
-	{
-	    if(!this.isServerSide())
-	    {
-	        HiggsWom.network.sendToServer(new WomPacketMiningCheck(this.player, this.getHasMining()));
-	    }
-	    else
-	    {
-	    	HiggsWom.network.sendTo(new WomPacketMiningCheck(this.player, this.getHasMining()), (EntityPlayerMP)player);
-	    }
-	}
-	
+
 	public void syncMana()
 	{
 	    if(!this.isServerSide())
@@ -133,42 +118,51 @@ public class WomPlayerData implements IExtendedEntityProperties
 	    }
 	}
 
-	public void requestSyncAll()
-	{
-	    if(!this.isServerSide())
-	    {
-	    	HiggsWom.network.sendToServer(new WomPacketSyncPlayerData());
-	    }
-	}
-	
     @Override
     public void saveNBTData(NBTTagCompound nbt)
     {
     	nbt.setInteger("mana", this.getMana());
     	nbt.setInteger("miningSkill", this.getMiningSkill());
     	
-    	nbt.setBoolean("mining", this.getHasMining());
+		// We need to create a new tag compound that will save everything for our Extended Properties
+		NBTTagCompound properties = new NBTTagCompound();
+
+		// We only have 2 variables currently; save them both to the new tag
+		properties.setInteger("mana", this.getMana());
+		properties.setInteger("miningSkill", this.getMiningSkill());
+
+		// Now add our custom tag to the player's tag with a unique name (our property's name)
+		// This will allow you to save multiple types of properties and distinguish between them
+		// If you only have one type, it isn't as important, but it will still avoid conflicts between
+		// your tag names and vanilla tag names. For instance, if you add some "Items" tag,
+		// that will conflict with vanilla. Not good. So just use a unique tag name.
+		nbt.setTag(identifier, properties);
     }
 
     @Override
     public void loadNBTData(NBTTagCompound nbt)
     {
-    	if(nbt.hasKey("mana", 3))
-    	{
-    		System.out.println("MANA HAS VALUE " + nbt.getInteger("mana"));
-            this.setMana(nbt.getInteger("mana"));
-    	}
-    	if(nbt.hasKey("miningSkill", 3))
-    	{
-    		System.out.println("MINING SKILL HAS VALUE " + nbt.getInteger("miningSkill"));
-            this.setMiningSkill(nbt.getInteger("miningSkill"));
-    	}
-    	
-    	if(nbt.hasKey("mining", 1))
-    	{
-    		System.out.println("MINING CHECK HAS VALUE " + nbt.getBoolean("mining"));
-            this.setHasMining(nbt.getBoolean("mining"));
-    	}
+//    	if(nbt.hasKey("mana", 3))
+//    	{
+//    		System.out.println("MANA HAS VALUE " + nbt.getInteger("mana"));
+//            this.setMana(nbt.getInteger("mana"));
+//    	}
+//    	if(nbt.hasKey("miningSkill", 3))
+//    	{
+//    		System.out.println("MINING SKILL HAS VALUE " + nbt.getInteger("miningSkill"));
+//            this.setMiningSkill(nbt.getInteger("miningSkill"));
+//    	}
+
+		// Here we fetch the unique tag compound we set for this class of Extended Properties
+		NBTTagCompound properties = (NBTTagCompound)nbt.getTag(identifier);
+		// Get our data from the custom tag compound
+		if(properties != null)
+		{
+			this.setMana(properties.getInteger("mana")); //= properties.getInteger("CurrentMana");
+			this.setMiningSkill(properties.getInteger("miningSkill"));// = properties.getInteger("MaxMana");
+		}
+		// Just so you know it's working, add this line:
+//		System.out.println("[WOM PROPS] Mana/Mining Skill from NBT: " + this.getMana() + "/" + this.getMiningSkill());
     }
 
     @Override
