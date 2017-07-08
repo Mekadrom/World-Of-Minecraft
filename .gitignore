@@ -25,6 +25,7 @@ hs_err_pid*
 .git
 .idea
 .settings
+/.gradle
 /asm
 /bin
 /blueprints
@@ -44,3 +45,4 @@ options.txt
 eula.txt
 minetweaker.log
 servers.dat
+

@@ -123,13 +123,17 @@ public class WomPlayerData implements IExtendedEntityProperties
     {
     	nbt.setInteger("mana", this.getMana());
     	nbt.setInteger("miningSkill", this.getMiningSkill());
-    	
+    	nbt.setInteger("playerId", this.getPlayerRef().getEntityId());
+    	nbt.setInteger("worldId", this.getPlayerRef().dimension);
+
 		// We need to create a new tag compound that will save everything for our Extended Properties
 		NBTTagCompound properties = new NBTTagCompound();
 
 		// We only have 2 variables currently; save them both to the new tag
 		properties.setInteger("mana", this.getMana());
 		properties.setInteger("miningSkill", this.getMiningSkill());
+		properties.setInteger("playerId", this.getPlayerRef().getEntityId());
+		properties.setInteger("worldId", this.getPlayerRef().dimension);
 
 		// Now add our custom tag to the player's tag with a unique name (our property's name)
 		// This will allow you to save multiple types of properties and distinguish between them
