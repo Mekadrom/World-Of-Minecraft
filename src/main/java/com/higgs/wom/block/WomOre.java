@@ -8,6 +8,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
@@ -59,11 +60,11 @@ public class WomOre extends Block
 					{
 						for(ItemStack itemStack : getDrops(world, x, y, z, 0, 0))
 						{
-							EntityItem item = new EntityItem(world, x + 0.5d, y + 0.25d, z + 0.5d, itemStack);
+							EntityItem item = new EntityItem(world, player.posX, player.posY, player.posZ, itemStack);
 							world.spawnEntityInWorld(item);
 						}
 					}
-					world.setBlockToAir(x, y, z);
+					world.setBlock(x, y, z, Blocks.stone);
 				}
 				else
 				{
