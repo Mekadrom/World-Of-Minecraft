@@ -17,32 +17,15 @@ public class WomEventHandlerCommon
 	@SubscribeEvent
 	public void onEntityConstructing(EntityConstructing e)
 	{
-//	    if(e.entity instanceof EntityPlayer)// || e.entity instanceof EntityPlayerMP)
-//	    {
-////	    	e.entity.registerExtendedProperties("womPlayerData", new WomPlayerData((EntityPlayer)e.entity));
-//	        WomPlayerData.register((EntityPlayer)e.entity);
-//	    }
-
 		if(e.entity instanceof EntityPlayer && WomPlayerData.get((EntityPlayer) e.entity) == null)
 		{
-			// This is how extended properties are registered using our convenient method from earlier
 			WomPlayerData.register((EntityPlayer)e.entity);
 		}
-		// That will call the constructor as well as cause the init() method
-		// to be called automatically
-
-		// If you didn't make the two convenient methods from earlier, your code would be
-		// much uglier:
 	}
 
 	@SubscribeEvent
 	public void onEntityJoinWorld(EntityJoinWorldEvent e)
 	{
-//	    if(e.entity instanceof EntityPlayer)// || e.entity instanceof EntityPlayerMP)
-//	    {
-//	    	e.entity.registerExtendedProperties("womPlayerData", new WomPlayerData((EntityPlayer)e.entity));
-//	    }
-
 		if(e.entity instanceof EntityPlayerMP)
 		{
 			final EntityPlayerMP entity = (EntityPlayerMP)e.entity;

@@ -94,18 +94,6 @@ public class WomPlayerData implements IExtendedEntityProperties
 	    }
 	}
 
-	public void syncMana()
-	{
-	    if(!this.isServerSide())
-	    {
-	        HiggsWom.network.sendToServer(new WomPacketMiningLevel(this.player, this.getMana()));
-	    }
-	    else
-	    {
-	    	HiggsWom.network.sendTo(new WomPacketMiningLevel(this.player, this.getMana()), (EntityPlayerMP)player);
-	    }
-	}
-	
 	public void syncAll()
 	{
 	    if(!this.isServerSide())
@@ -126,47 +114,26 @@ public class WomPlayerData implements IExtendedEntityProperties
     	nbt.setInteger("playerId", this.getPlayerRef().getEntityId());
     	nbt.setInteger("worldId", this.getPlayerRef().dimension);
 
-		// We need to create a new tag compound that will save everything for our Extended Properties
 		NBTTagCompound properties = new NBTTagCompound();
 
-		// We only have 2 variables currently; save them both to the new tag
 		properties.setInteger("mana", this.getMana());
 		properties.setInteger("miningSkill", this.getMiningSkill());
 		properties.setInteger("playerId", this.getPlayerRef().getEntityId());
 		properties.setInteger("worldId", this.getPlayerRef().dimension);
 
-		// Now add our custom tag to the player's tag with a unique name (our property's name)
-		// This will allow you to save multiple types of properties and distinguish between them
-		// If you only have one type, it isn't as important, but it will still avoid conflicts between
-		// your tag names and vanilla tag names. For instance, if you add some "Items" tag,
-		// that will conflict with vanilla. Not good. So just use a unique tag name.
 		nbt.setTag(identifier, properties);
     }
 
     @Override
     public void loadNBTData(NBTTagCompound nbt)
     {
-//    	if(nbt.hasKey("mana", 3))
-//    	{
-//    		System.out.println("MANA HAS VALUE " + nbt.getInteger("mana"));
-//            this.setMana(nbt.getInteger("mana"));
-//    	}
-//    	if(nbt.hasKey("miningSkill", 3))
-//    	{
-//    		System.out.println("MINING SKILL HAS VALUE " + nbt.getInteger("miningSkill"));
-//            this.setMiningSkill(nbt.getInteger("miningSkill"));
-//    	}
-
-		// Here we fetch the unique tag compound we set for this class of Extended Properties
 		NBTTagCompound properties = (NBTTagCompound)nbt.getTag(identifier);
-		// Get our data from the custom tag compound
+
 		if(properties != null)
 		{
 			this.setMana(properties.getInteger("mana")); //= properties.getInteger("CurrentMana");
 			this.setMiningSkill(properties.getInteger("miningSkill"));// = properties.getInteger("MaxMana");
 		}
-		// Just so you know it's working, add this line:
-//		System.out.println("[WOM PROPS] Mana/Mining Skill from NBT: " + this.getMana() + "/" + this.getMiningSkill());
     }
 
     @Override

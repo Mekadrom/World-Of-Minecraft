@@ -28,10 +28,7 @@ public class WomOre extends Block
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockWomOre");
 		setCreativeTab(HiggsWom.tabWom);
-//		setHardness(2.2f);
 		setBlockUnbreakable();
-//		setResistance(6.0f);
-//		setHarvestLevel("pickaxe", 0);
 	}
 	
 	@Override
@@ -41,9 +38,6 @@ public class WomOre extends Block
 		
 		boolean hasPickaxe = false;
 
-//		WomPlayerData.get(player).setMiningSkill(1);
-//		WomPlayerData.get(player).syncAll();
-		
 		if(player.getCurrentEquippedItem() != null)
 		{
 			if(Item.getIdFromItem(player.getCurrentEquippedItem().getItem()) == Item.getIdFromItem(WomItems.itemWarcraftPickaxe))
@@ -51,10 +45,10 @@ public class WomOre extends Block
 				hasPickaxe = true;
 			}
 		}
-		if(player instanceof EntityPlayerMP) {
+		if(player instanceof EntityPlayerMP)
+		{
 			if(WomPlayerData.get(player).getMiningSkill() < this.miningLevel)
 			{
-				System.out.println("PLAYER DOES NOT HAVE MINING " + WomPlayerData.get(player).getMiningSkill());
 				player.addChatMessage(new ChatComponentText("Requires Mining Skill (" + miningLevel + ")."));
 			}
 			else
