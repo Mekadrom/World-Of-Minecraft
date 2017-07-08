@@ -36,7 +36,7 @@ public class BlockSilverOre extends WomOre
         
         if(gem0 <= 0.05f)
         {
-            drops.add(new ItemStack(WomItems.itemMossagateGem));
+            drops.add(new ItemStack(WomItems.itemMossAgateGem));
         }
         
         if(gem1 <= 0.03f)
