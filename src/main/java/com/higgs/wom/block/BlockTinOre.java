@@ -11,8 +11,6 @@ import net.minecraft.world.World;
 
 public class BlockTinOre extends WomOre
 {
-//	private Item drop = WomItems.itemCopperOre;
-	
 	public BlockTinOre(String unlocalizedName, Material material)
 	{
 		super(material);
@@ -22,6 +20,7 @@ public class BlockTinOre extends WomOre
 		setHardness(2.0f);
 		setResistance(6.0f);
 		setHarvestLevel("pickaxe", 1);
+		this.miningLevel = 1;
 	}
 	
 	@Override

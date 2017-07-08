@@ -11,7 +11,6 @@ import net.minecraft.world.World;
 
 public class BlockSilverOre extends WomOre
 {
-
 	public BlockSilverOre(String unlocalizedName, Material material)
 	{
 		super(material);
@@ -21,6 +20,7 @@ public class BlockSilverOre extends WomOre
 		setHardness(2.0f);
 		setResistance(6.0f);
 		setHarvestLevel("pickaxe", 2);
+		this.miningLevel = 65;
 	}
 	
 	@Override

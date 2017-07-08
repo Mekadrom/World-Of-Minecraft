@@ -6,6 +6,8 @@ import com.higgs.wom.HiggsWom;
 import com.higgs.wom.block.WomBlocks;
 
 import cpw.mods.fml.common.IWorldGenerator;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenMinable;
@@ -41,13 +43,13 @@ public class WomOreGen implements IWorldGenerator
 		{
 		    case 0:    //Overworld
 		    {
-		    	this.runGenerator(this.genCopperOre, world, random, chunkX, chunkZ, HiggsWom.oreCopperVeinRarity, HiggsWom.oreCopperMinY, HiggsWom.oreCopperMaxY); //defaults 16, 24, 80
-		    	this.runGenerator(this.genTinOre, world, random, chunkX, chunkZ, HiggsWom.oreTinVeinRarity, HiggsWom.oreTinMinY, HiggsWom.oreTinMaxY); //defaults 14, 12, 48
-		    	this.runGenerator(this.genSilverOre, world, random, chunkX, chunkZ, HiggsWom.oreSilverVeinRarity, HiggsWom.oreSilverMinY, HiggsWom.oreSilverMaxY); //defaults 10, 8, 32
-		    	this.runGenerator(this.genMithrilOre, world, random, chunkX, chunkZ, HiggsWom.oreMithrilVeinRarity, HiggsWom.oreMithrilMinY, HiggsWom.oreSilverMaxY); //defaults 10, 4, 28
-		    	this.runGenerator(this.genThoriumOre, world, random, chunkX, chunkZ, HiggsWom.oreThoriumVeinRarity, HiggsWom.oreThoriumMinY, HiggsWom.oreThoriumMaxY); //defaults 6, 0, 20
-		    	this.runGenerator(this.genTruesilverOre, world, random, chunkX, chunkZ, HiggsWom.oreTruesilverVeinRarity, HiggsWom.oreTruesilverMinY, HiggsWom.oreTruesilverMaxY); //defaults 6, 0, 16
-		    	this.runGenerator(this.genDarkIronOre, world, random, chunkX, chunkZ, HiggsWom.oreDarkIronVeinRarity, HiggsWom.oreDarkIronMinY, HiggsWom.oreDarkIronMaxY); //defaults 5, 0, 6
+		    	this.runGenerator(this.genCopperOre, world, random, chunkX, chunkZ, HiggsWom.oreCopperVeinRarity, HiggsWom.oreCopperMinY, HiggsWom.oreCopperMaxY, WomBlocks.blockCopperOre); //defaults 16, 24, 80
+		    	this.runGenerator(this.genTinOre, world, random, chunkX, chunkZ, HiggsWom.oreTinVeinRarity, HiggsWom.oreTinMinY, HiggsWom.oreTinMaxY, WomBlocks.blockTinOre); //defaults 14, 12, 48
+		    	this.runGenerator(this.genSilverOre, world, random, chunkX, chunkZ, HiggsWom.oreSilverVeinRarity, HiggsWom.oreSilverMinY, HiggsWom.oreSilverMaxY, WomBlocks.blockSilverOre); //defaults 10, 8, 32
+		    	this.runGenerator(this.genMithrilOre, world, random, chunkX, chunkZ, HiggsWom.oreMithrilVeinRarity, HiggsWom.oreMithrilMinY, HiggsWom.oreSilverMaxY, WomBlocks.blockMithrilOre); //defaults 10, 4, 28
+		    	this.runGenerator(this.genThoriumOre, world, random, chunkX, chunkZ, HiggsWom.oreThoriumVeinRarity, HiggsWom.oreThoriumMinY, HiggsWom.oreThoriumMaxY, WomBlocks.blockThoriumOre); //defaults 6, 0, 20
+		    	this.runGenerator(this.genTruesilverOre, world, random, chunkX, chunkZ, HiggsWom.oreTruesilverVeinRarity, HiggsWom.oreTruesilverMinY, HiggsWom.oreTruesilverMaxY, WomBlocks.blockTruesilverOre); //defaults 6, 0, 16
+		    	this.runGenerator(this.genDarkIronOre, world, random, chunkX, chunkZ, HiggsWom.oreDarkIronVeinRarity, HiggsWom.oreDarkIronMinY, HiggsWom.oreDarkIronMaxY, WomBlocks.blockDarkIronOre); //defaults 5, 0, 6
 		    	
 		    	break;
 		    }
@@ -57,14 +59,14 @@ public class WomOreGen implements IWorldGenerator
 		    }
 		    case 1:    //End
 		    {
-		    	this.runGenerator(this.genFelIronOre, world, random, chunkX, chunkZ, HiggsWom.oreFelIronVeinRarity, HiggsWom.oreFelIronMinY, HiggsWom.oreFelIronMaxY); //defaults 4, 0, 256
+		    	this.runGenerator(this.genFelIronOre, world, random, chunkX, chunkZ, HiggsWom.oreFelIronVeinRarity, HiggsWom.oreFelIronMinY, HiggsWom.oreFelIronMaxY, WomBlocks.blockFelIronOre); //defaults 4, 0, 256
 		    	
 		        break;
 		    }
 	    }
 	}
 	
-	private void runGenerator(WorldGenerator generator, World world, Random rand, int chunk_X, int chunk_Z, int chancesToSpawn, int minHeight, int maxHeight)
+	private void runGenerator(WorldGenerator generator, World world, Random rand, int chunk_X, int chunk_Z, int chancesToSpawn, int minHeight, int maxHeight, Block toSpawn)
 	{
 	    if(minHeight < 0 || maxHeight > 256 || minHeight > maxHeight)
 	    {
@@ -80,6 +82,33 @@ public class WomOreGen implements IWorldGenerator
 	        int z = chunk_Z * 16 + rand.nextInt(16);
 	        
 	        generator.generate(world, rand, x, y, z);
+
+	        if(toSpawn != null)
+			{
+				int idToSpawn = Block.getIdFromBlock(toSpawn);
+				double chanceToReplace = world.rand.nextDouble();
+
+				if(idToSpawn == Block.getIdFromBlock(WomBlocks.blockTinOre) && chanceToReplace <= 0.05)
+				{
+					world.setBlock(x, y, z, WomBlocks.blockSilverOre);
+				}
+				else if(idToSpawn == Block.getIdFromBlock(WomBlocks.blockSilverOre) && chanceToReplace <= 0.05)
+				{
+					world.setBlock(x, y, z, WomBlocks.blockTinOre);
+				}
+				else if(idToSpawn == Block.getIdFromBlock(WomBlocks.blockMithrilOre) && chanceToReplace <= 0.05)
+				{
+					world.setBlock(x, y, z, WomBlocks.blockTruesilverOre);
+				}
+				else if(idToSpawn == Block.getIdFromBlock(WomBlocks.blockTruesilverOre) && chanceToReplace <= 0.05)
+				{
+					world.setBlock(x, y, z, WomBlocks.blockMithrilOre);
+				}
+				else if(idToSpawn == Block.getIdFromBlock(WomBlocks.blockThoriumOre) && chanceToReplace <= 0.05)
+				{
+
+				}
+			}
 	    }
 	}
 }
