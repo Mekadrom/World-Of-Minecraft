@@ -81,7 +81,7 @@ public final class WomItems
 	public static Item itemMoteOfEarth;
 	public static Item itemMoteOfWater;
 	public static Item itemMoteOfAir;
-	public static Item itemMoteofFire;
+	public static Item itemMoteOfFire;
 	
 	public static Item itemPrimalEarth;
 	public static Item itemPrimalWater;
@@ -169,7 +169,7 @@ public final class WomItems
 		GameRegistry.registerItem(itemMoteOfEarth = new WomItem().setUnlocalizedName("itemMoteOfEarth").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemMoteOfEarth"), "itemMoteOfEarth");
 		GameRegistry.registerItem(itemMoteOfWater = new WomItem().setUnlocalizedName("itemMoteOfWater").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemMoteOfWater"), "itemMoteOfWater");
 		GameRegistry.registerItem(itemMoteOfAir = new WomItem().setUnlocalizedName("itemMoteOfAir").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemMoteOfAir"), "itemMoteOfAir");
-		GameRegistry.registerItem(itemMoteofFire = new WomItem().setUnlocalizedName("itemMoteofFire").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemMoteofFire"), "itemMoteofFire");
+		GameRegistry.registerItem(itemMoteOfFire = new WomItem().setUnlocalizedName("itemMoteOfFire").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemMoteOfFire"), "itemMoteOfFire");
 		
 		GameRegistry.registerItem(itemPrimalEarth = new WomItem().setUnlocalizedName("itemPrimalEarth").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemPrimalEarth"), "itemPrimalEarth");
 		GameRegistry.registerItem(itemPrimalWater = new WomItem().setUnlocalizedName("itemPrimalWater").setCreativeTab(HiggsWom.tabWom).setTextureName(HiggsWom.MODID + ":itemPrimalWater"), "itemPrimalWater");

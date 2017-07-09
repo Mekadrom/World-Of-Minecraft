@@ -1,16 +1,16 @@
 package com.higgs.wom.proxy;
 
-import java.util.ArrayList;
-
+import com.higgs.wom.HiggsWom;
 import com.higgs.wom.block.WomBlocks;
 import com.higgs.wom.event.WomEventHandlerCommon;
 import com.higgs.wom.item.WomItems;
+import com.higgs.wom.network.WomGuiHandler;
 import com.higgs.wom.world.WomFlowerGen;
 import com.higgs.wom.world.WomOreGen;
-
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,6 +18,8 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.oredict.OreDictionary;
+
+import java.util.ArrayList;
 
 public class CommonProxy
 {
@@ -84,7 +86,9 @@ public class CommonProxy
     	{
     		GameRegistry.addShapelessRecipe(new ItemStack(WomItems.itemMithrilBar), phillyStone, platinums.get(i));
     	}
-    	
+
+		NetworkRegistry.INSTANCE.registerGuiHandler(HiggsWom.instance, new WomGuiHandler());
+
         initWorldGens();
     	initSmeltingRecipes();
     	

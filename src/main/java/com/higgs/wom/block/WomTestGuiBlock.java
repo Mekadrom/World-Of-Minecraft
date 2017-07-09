@@ -1,16 +1,15 @@
 package com.higgs.wom.block;
 
 import com.higgs.wom.HiggsWom;
-import com.higgs.wom.entitydata.WomPlayerData;
-
+import com.higgs.wom.network.WomGuiHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 
-public class MiningLearner extends Block
+public class WomTestGuiBlock extends Block
 {
-	protected MiningLearner(String unlocalizedName, Material material)
+	protected WomTestGuiBlock(String unlocalizedName, Material material)
 	{
 		super(material);
 		setBlockName(unlocalizedName);
@@ -24,9 +23,11 @@ public class MiningLearner extends Block
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int i, float f0, float f1, float f2)
 	{
-		WomPlayerData.get(player).setMiningSkill(1);
-		WomPlayerData.get(player).syncAll();
-		
+		if(!world.isRemote)
+		{
+			player.openGui(HiggsWom.instance, WomGuiHandler.WOM_MINING_SKILL_GUI, world, x, y, z);
+		}
+
 		return blockConstructorCalled;
 	}
 }

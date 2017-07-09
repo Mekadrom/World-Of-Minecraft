@@ -28,8 +28,8 @@ public final class WomBlocks
 		GameRegistry.registerBlock(blockThoriumOre = new BlockThoriumOre("blockThoriumOre", Material.rock), "blockThoriumOre");
 		GameRegistry.registerBlock(blockTruesilverOre = new BlockTruesilverOre("blockTruesilverOre", Material.rock), "blockTruesilverOre");
 		GameRegistry.registerBlock(blockDarkIronOre = new BlockDarkIronOre("blockDarkIronOre", Material.rock), "blockDarkIronOre");
-		GameRegistry.registerBlock(blockFelIronOre = new BlockDarkIronOre("blockFelIronOre", Material.rock), "blockFelIronOre");
-		GameRegistry.registerBlock(TESTBLOCK = new MiningLearner("TESTBLOCK", Material.rock), "TESTBLOCK");
+		GameRegistry.registerBlock(blockFelIronOre = new BlockFelIronOre("blockFelIronOre", Material.rock), "blockFelIronOre");
+		GameRegistry.registerBlock(TESTBLOCK = new WomTestGuiBlock("TESTBLOCK", Material.rock), "TESTBLOCK");
 		
 		GameRegistry.registerBlock(blockFirebloomFlower = new BlockWomFlower("blockFirebloomFlower", Material.plants, 0.3f, 0.0f, 0.3f, 0.8f, 0.8f, 0.8f), "blockFirebloomFlower");
 		GameRegistry.registerBlock(blockPurpleLotusFlower = new BlockWomFlower("blockPurpleLotusFlower", Material.plants, 0.1f, 0.0f, 0.1f, 0.9f, 0.9f, 0.9f), "blockPurpleLotusFlower");

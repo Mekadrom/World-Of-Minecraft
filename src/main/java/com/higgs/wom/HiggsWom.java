@@ -1,14 +1,11 @@
 package com.higgs.wom;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import com.higgs.wom.client.gui.WomKeyHandler;
 import com.higgs.wom.item.WomItems;
 import com.higgs.wom.network.packets.WomPacketMiningLevel;
 import com.higgs.wom.network.packets.WomPacketSyncPlayerData;
 import com.higgs.wom.proxy.CommonProxy;
-
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -24,6 +21,9 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(modid = HiggsWom.MODID, name = HiggsWom.MODNAME, version = HiggsWom.VERSION)
 public class HiggsWom
@@ -96,14 +96,15 @@ public class HiggsWom
     public static int oreFelIronDropRateOre;
     
     public static int flowerFirebloomRarity;
-    
     public static int flowerPurpleLotusRarity;
     
     public static float roughBlastingPowderStrength;
     public static float coarseBlastingPowderStrength;
     public static float solidBlastingPowderStrength;
     public static float denseBlastingPowderStrength;
-    
+
+    public static boolean harvestingOreOpensGui;
+
     @SidedProxy(clientSide="com.higgs.wom.proxy.ClientProxy", serverSide="com.higgs.wom.proxy.ServerProxy")
 	public static CommonProxy proxy;
     
@@ -131,6 +132,8 @@ public class HiggsWom
     @EventHandler
     public void init(FMLInitializationEvent e)
     {
+        FMLCommonHandler.instance().bus().register(new WomKeyHandler());
+
         proxy.init(e);
     }
         
@@ -196,85 +199,88 @@ public class HiggsWom
             Property oreFelIronVeinSizeProp = config.get("feliron", "oreFelIronVeinSize", "4", "determines size of fel iron ore veins.");
             Property oreFelIronVeinRarityProp = config.get("feliron", "oreFelIronVeinRarity", "5", "determines the rarity of fel iron ore veins (chance to spawn a vein in a particular chunk).");
             Property oreFelIronVeinMinYProp = config.get("feliron", "oreFelIronVeinMinY", "0", "determines the minimum y value that fel iron ore veins can spawn at.");
-            Property oreFelIronVeinMaxYProp = config.get("feliron", "oreFelIronVeinMaxY", "256", "determines the maximum y value that fel iron ore veins can spawn at.");
-            
-            
+            Property oreFelIronVeinMaxYProp = config.get("feliron", "oreFelIronVeinMaxY", "6", "determines the maximum y value that fel iron ore veins can spawn at.");
+
+            Property flowerFirebloomRarityProp = config.get("flowers", "flowerFirebloomRarity", "4", "determines the rarity of fireblooms.");
+            Property flowerPurpleLotusRarityProp = config.get("flowers", "flowerPurpleLotusRarity", "4", "determines the rarity of purple lotuses.");
+
             Property roughBlastingPowderStrengthProp = config.get("blastingpowder", "roughBlastingPowderStrength", "0.25", "determines the strength of rough blasting powder.");
             Property coarseBlastingPowderStrengthProp = config.get("blastingpowder", "oreDarkIronVeinMaxY", "0.33", "determines the strength of coarse blasting powder.");
             Property solidBlastingPowderStrengthProp = config.get("blastingpowder", "oreDarkIronVeinMaxY", "0.50", "determines the strength of solid blasting powder.");
             Property denseBlastingPowderStrengthProp = config.get("blastingpowder", "oreDarkIronVeinMaxY", "0.75", "determines the strength of dense blasting powder.");
             
-            Property flowerFirebloomRarityProp = config.get("flowers", "flowerFirebloomRarity", "4", "determines the rarity of fireblooms.");
-            Property flowerPurpleLotusRarityProp = config.get("flowers", "flowerPurpleLotusRarity", "4", "determines the rarity of purple lotuses.");
+            Property harvestingOreOpensGuiProp = config.get("miscellaneous", "harvestingOreOpensGui", "false", "toggles whether harvesting ores opens an inventory with the contents instead of dropping them.");
             
             verboseOutput = verboseOutputProp.getBoolean();
-            
+
+            oreCopperVeinSpawns = oreCopperVeinSpawnsProp.getBoolean();
+            oreCopperVeinSize = oreCopperVeinSizeProp.getInt();
+            oreCopperVeinRarity = oreCopperVeinRarityProp.getInt();
+            oreCopperMinY = oreCopperVeinMinYProp.getInt();
+            oreCopperMaxY = oreCopperVeinMaxYProp.getInt();
+
+            oreTinVeinSpawns = oreTinVeinSpawnsProp.getBoolean();
+            oreTinVeinSize = oreTinVeinSizeProp.getInt();
+            oreTinVeinRarity = oreTinVeinRarityProp.getInt();
+            oreTinMinY = oreTinVeinMinYProp.getInt();
+            oreTinMaxY = oreTinVeinMaxYProp.getInt();
+
+            oreSilverVeinSpawns = oreSilverVeinSpawnsProp.getBoolean();
+            oreSilverVeinSize = oreSilverVeinSizeProp.getInt();
+            oreSilverVeinRarity = oreSilverVeinRarityProp.getInt();
+            oreSilverMinY = oreSilverVeinMinYProp.getInt();
+            oreSilverMaxY = oreSilverVeinMaxYProp.getInt();
+
+            oreMithrilVeinSpawns = oreMithrilVeinSpawnsProp.getBoolean();
+            oreMithrilVeinSize = oreMithrilVeinSizeProp.getInt();
+            oreMithrilVeinRarity = oreMithrilVeinRarityProp.getInt();
+            oreMithrilMinY = oreMithrilVeinMinYProp.getInt();
+            oreMithrilMaxY = oreMithrilVeinMaxYProp.getInt();
+
+            oreThoriumVeinSpawns = oreThoriumVeinSpawnsProp.getBoolean();
+            oreThoriumVeinSize = oreThoriumVeinSizeProp.getInt();
+            oreThoriumVeinRarity = oreThoriumVeinRarityProp.getInt();
+            oreThoriumMinY = oreThoriumVeinMinYProp.getInt();
+            oreThoriumMaxY = oreThoriumVeinMaxYProp.getInt();
+
+            oreTruesilverVeinSpawns = oreTruesilverVeinSpawnsProp.getBoolean();
+            oreTruesilverVeinSize = oreTruesilverVeinSizeProp.getInt();
+            oreTruesilverVeinRarity = oreTruesilverVeinRarityProp.getInt();
+            oreTruesilverMinY = oreTruesilverVeinMinYProp.getInt();
+            oreTruesilverMaxY = oreTruesilverVeinMaxYProp.getInt();
+
+            oreDarkIronVeinSpawns = oreDarkIronVeinSpawnsProp.getBoolean();
+            oreDarkIronVeinSize = oreDarkIronVeinSizeProp.getInt();
+            oreDarkIronVeinRarity = oreDarkIronVeinRarityProp.getInt();
+            oreDarkIronMinY = oreDarkIronVeinMinYProp.getInt();
+            oreDarkIronMaxY = oreDarkIronVeinMaxYProp.getInt();
+
+            oreFelIronVeinSpawns = oreFelIronVeinSpawnsProp.getBoolean();
+            oreFelIronVeinSize = oreFelIronVeinSizeProp.getInt();
+            oreFelIronVeinRarity = oreFelIronVeinRarityProp.getInt();
+            oreFelIronMinY = oreFelIronVeinMinYProp.getInt();
+            oreFelIronMaxY = oreFelIronVeinMaxYProp.getInt();
+
+            flowerFirebloomRarity = flowerFirebloomRarityProp.getInt();
+            flowerPurpleLotusRarity = flowerPurpleLotusRarityProp.getInt();
+
+            roughBlastingPowderStrength = Float.parseFloat(roughBlastingPowderStrengthProp.getString());
+            coarseBlastingPowderStrength = Float.parseFloat(coarseBlastingPowderStrengthProp.getString());
+            solidBlastingPowderStrength = Float.parseFloat(solidBlastingPowderStrengthProp.getString());
+            denseBlastingPowderStrength = Float.parseFloat(denseBlastingPowderStrengthProp.getString());
+
+            harvestingOreOpensGui = harvestingOreOpensGuiProp.getBoolean();
+
             if(verboseOutput)
             {
-            	oreCopperVeinSpawns = oreCopperVeinSpawnsProp.getBoolean();
-	            oreCopperVeinSize = oreCopperVeinSizeProp.getInt();
-	            oreCopperVeinRarity = oreCopperVeinRarityProp.getInt();
-	            oreCopperMinY = oreCopperVeinMinYProp.getInt();
-	            oreCopperMaxY = oreCopperVeinMaxYProp.getInt();
 	            HiggsWom.log(Level.INFO, "Size of copper ore veins configured to be " + oreCopperVeinSize + (oreCopperVeinSpawns ? " and they DO spawn." : " but they DO NOT spawn."));
-	            
-	            oreTinVeinSpawns = oreTinVeinSpawnsProp.getBoolean();
-	            oreTinVeinSize = oreTinVeinSizeProp.getInt();
-	            oreTinVeinRarity = oreTinVeinRarityProp.getInt();
-	            oreTinMinY = oreTinVeinMinYProp.getInt();
-	            oreTinMaxY = oreTinVeinMaxYProp.getInt();
 	            HiggsWom.log(Level.INFO, "Size of tin ore veins configured to be " + oreTinVeinSize + (oreTinVeinSpawns ? " and they DO spawn." : " but they DO NOT spawn."));
-	            
-	            oreSilverVeinSpawns = oreSilverVeinSpawnsProp.getBoolean();
-	            oreSilverVeinSize = oreSilverVeinSizeProp.getInt();
-	            oreSilverVeinRarity = oreSilverVeinRarityProp.getInt();
-	            oreSilverMinY = oreSilverVeinMinYProp.getInt();
-	            oreSilverMaxY = oreSilverVeinMaxYProp.getInt();
 	            HiggsWom.log(Level.INFO, "Size of silver ore veins configured to be " + oreSilverVeinSize + (oreSilverVeinSpawns ? " and they DO spawn." : " but they DO NOT spawn."));
-	            
-	            oreMithrilVeinSpawns = oreMithrilVeinSpawnsProp.getBoolean();
-	            oreMithrilVeinSize = oreMithrilVeinSizeProp.getInt();
-	            oreMithrilVeinRarity = oreMithrilVeinRarityProp.getInt();
-	            oreMithrilMinY = oreMithrilVeinMinYProp.getInt();
-	            oreMithrilMaxY = oreMithrilVeinMaxYProp.getInt();
 	            HiggsWom.log(Level.INFO, "Size of mithril ore veins configured to be " + oreMithrilVeinSize + (oreMithrilVeinSpawns ? " and they DO spawn." : " but they DO NOT spawn."));
-	            
-	            oreThoriumVeinSpawns = oreThoriumVeinSpawnsProp.getBoolean();
-	            oreThoriumVeinSize = oreThoriumVeinSizeProp.getInt();
-	            oreThoriumVeinRarity = oreThoriumVeinRarityProp.getInt();
-	            oreThoriumMinY = oreThoriumVeinMinYProp.getInt();
-	            oreThoriumMaxY = oreThoriumVeinMaxYProp.getInt();
 	            HiggsWom.log(Level.INFO, "Size of thorium ore veins configured to be " + oreThoriumVeinSize + (oreThoriumVeinSpawns ? " and they DO spawn." : " but they DO NOT spawn."));
-	            
-	            oreTruesilverVeinSpawns = oreTruesilverVeinSpawnsProp.getBoolean();
-	            oreTruesilverVeinSize = oreTruesilverVeinSizeProp.getInt();
-	            oreTruesilverVeinRarity = oreTruesilverVeinRarityProp.getInt();
-	            oreTruesilverMinY = oreTruesilverVeinMinYProp.getInt();
-	            oreTruesilverMaxY = oreTruesilverVeinMaxYProp.getInt();
 	            HiggsWom.log(Level.INFO, "Size of truesilver ore veins configured to be " + oreTruesilverVeinSize + (oreTruesilverVeinSpawns ? " and they DO spawn." : " but they DO NOT spawn."));
-	            
-	            oreDarkIronVeinSpawns = oreDarkIronVeinSpawnsProp.getBoolean();
-	            oreDarkIronVeinSize = oreDarkIronVeinSizeProp.getInt();
-	            oreDarkIronVeinRarity = oreDarkIronVeinRarityProp.getInt();
-	            oreDarkIronMinY = oreDarkIronVeinMinYProp.getInt();
-	            oreDarkIronMaxY = oreDarkIronVeinMaxYProp.getInt();
 	            HiggsWom.log(Level.INFO, "Size of dark iron ore veins configured to be " + oreDarkIronVeinSize + (oreDarkIronVeinSpawns ? " and they DO spawn." : " but they DO NOT spawn."));
-	            
-	            oreFelIronVeinSpawns = oreFelIronVeinSpawnsProp.getBoolean();
-	            oreFelIronVeinSize = oreFelIronVeinSizeProp.getInt();
-	            oreFelIronVeinRarity = oreFelIronVeinRarityProp.getInt();
-	            oreFelIronMinY = oreFelIronVeinMinYProp.getInt();
-	            oreFelIronMaxY = oreFelIronVeinMaxYProp.getInt();
-	            HiggsWom.log(Level.INFO, "Size of fgel iron ore veins configured to be " + oreFelIronVeinSize + (oreFelIronVeinSpawns ? " and they DO spawn." : " but they DO NOT spawn."));
-	            
-	            
-	            flowerFirebloomRarity = flowerFirebloomRarityProp.getInt();
-	            flowerPurpleLotusRarity = flowerPurpleLotusRarityProp.getInt();
-	            
-	            roughBlastingPowderStrength = Float.parseFloat(roughBlastingPowderStrengthProp.getString());
-	            coarseBlastingPowderStrength = Float.parseFloat(coarseBlastingPowderStrengthProp.getString());
-	            solidBlastingPowderStrength = Float.parseFloat(solidBlastingPowderStrengthProp.getString());
-	            denseBlastingPowderStrength = Float.parseFloat(denseBlastingPowderStrengthProp.getString());
+	            HiggsWom.log(Level.INFO, "Size of fel iron ore veins configured to be " + oreFelIronVeinSize + (oreFelIronVeinSpawns ? " and they DO spawn." : " but they DO NOT spawn."));
             }
         }
         catch(Exception e)

@@ -1,30 +1,22 @@
 package com.higgs.wom.block;
 
-import java.util.ArrayList;
-
 import com.higgs.wom.HiggsWom;
 import com.higgs.wom.item.WomItems;
-
 import net.minecraft.block.material.Material;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
+
 public class BlockDarkIronOre extends WomOre
 {
-//	private Item drop;
-//	private int meta;
-//	private int least_quantity;
-//	private int most_quantity;
-	
 	public BlockDarkIronOre(String unlocalizedName, Material material)
 	{
 		super(material);
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockDarkIronOre");
 		setCreativeTab(HiggsWom.tabWom);
-		setHardness(2.5f);
-		setResistance(6.0f);
-		setHarvestLevel("pickaxe", 2);
+		this.miningLevel = 230;
 	}
 	
 	@Override

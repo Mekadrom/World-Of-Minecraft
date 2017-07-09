@@ -1,10 +1,7 @@
 package com.higgs.wom.world;
 
-import java.util.Random;
-
 import com.higgs.wom.HiggsWom;
 import com.higgs.wom.block.WomBlocks;
-
 import cpw.mods.fml.common.IWorldGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -12,6 +9,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraft.world.gen.feature.WorldGenerator;
+
+import java.util.Random;
 
 public class WomOreGen implements IWorldGenerator
 {
@@ -32,14 +31,16 @@ public class WomOreGen implements IWorldGenerator
 	    this.genMithrilOre = new WorldGenMinable(WomBlocks.blockMithrilOre, HiggsWom.oreMithrilVeinSize); //default 6
 	    this.genThoriumOre = new WorldGenMinable(WomBlocks.blockThoriumOre, HiggsWom.oreThoriumVeinSize); //default 6
 	    this.genTruesilverOre = new WorldGenMinable(WomBlocks.blockTruesilverOre, HiggsWom.oreTruesilverVeinSize); //default 6
-	    this.genDarkIronOre = new WorldGenMinable(WomBlocks.blockDarkIronOre, HiggsWom.oreDarkIronVeinSize); //default 5
-	    this.genFelIronOre = new WorldGenMinable(WomBlocks.blockFelIronOre, HiggsWom.oreFelIronVeinSize); //default 4
+
+	    this.genDarkIronOre = new WorldGenMinable(WomBlocks.blockDarkIronOre, HiggsWom.oreDarkIronVeinSize, Blocks.stone); //default 5
+
+	    this.genFelIronOre = new WorldGenMinable(WomBlocks.blockFelIronOre, HiggsWom.oreFelIronVeinSize, Blocks.stone); //default 4
 	}
 	
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider)
 	{
-		switch (world.provider.dimensionId)
+		switch(world.provider.dimensionId)
 		{
 		    case 0:    //Overworld
 		    {
@@ -49,17 +50,20 @@ public class WomOreGen implements IWorldGenerator
 		    	this.runGenerator(this.genMithrilOre, world, random, chunkX, chunkZ, HiggsWom.oreMithrilVeinRarity, HiggsWom.oreMithrilMinY, HiggsWom.oreSilverMaxY, WomBlocks.blockMithrilOre); //defaults 10, 4, 28
 		    	this.runGenerator(this.genThoriumOre, world, random, chunkX, chunkZ, HiggsWom.oreThoriumVeinRarity, HiggsWom.oreThoriumMinY, HiggsWom.oreThoriumMaxY, WomBlocks.blockThoriumOre); //defaults 6, 0, 20
 		    	this.runGenerator(this.genTruesilverOre, world, random, chunkX, chunkZ, HiggsWom.oreTruesilverVeinRarity, HiggsWom.oreTruesilverMinY, HiggsWom.oreTruesilverMaxY, WomBlocks.blockTruesilverOre); //defaults 6, 0, 16
-		    	this.runGenerator(this.genDarkIronOre, world, random, chunkX, chunkZ, HiggsWom.oreDarkIronVeinRarity, HiggsWom.oreDarkIronMinY, HiggsWom.oreDarkIronMaxY, WomBlocks.blockDarkIronOre); //defaults 5, 0, 6
-		    	
+				this.runGenerator(this.genDarkIronOre, world, random, chunkX, chunkZ, HiggsWom.oreDarkIronVeinRarity, HiggsWom.oreDarkIronMinY, HiggsWom.oreDarkIronMaxY, WomBlocks.blockDarkIronOre); //defaults 5, 0, 6
+				this.runGenerator(this.genFelIronOre, world, random, chunkX, chunkZ, HiggsWom.oreFelIronVeinRarity, HiggsWom.oreFelIronMinY, HiggsWom.oreFelIronMaxY, WomBlocks.blockFelIronOre); //defaults 4, 0, 256
+
 		    	break;
 		    }
 		    case -1:   //Nether
 		    {
+//				this.runGenerator(this.genDarkIronOre, world, random, chunkX, chunkZ, HiggsWom.oreDarkIronVeinRarity, HiggsWom.oreDarkIronMinY, HiggsWom.oreDarkIronMaxY, WomBlocks.blockDarkIronOre); //defaults 5, 0, 6
+
 		        break;
 		    }
 		    case 1:    //End
 		    {
-		    	this.runGenerator(this.genFelIronOre, world, random, chunkX, chunkZ, HiggsWom.oreFelIronVeinRarity, HiggsWom.oreFelIronMinY, HiggsWom.oreFelIronMaxY, WomBlocks.blockFelIronOre); //defaults 4, 0, 256
+//		    	this.runGenerator(this.genFelIronOre, world, random, chunkX, chunkZ, HiggsWom.oreFelIronVeinRarity, HiggsWom.oreFelIronMinY, HiggsWom.oreFelIronMaxY, WomBlocks.blockFelIronOre); //defaults 4, 0, 256
 		    	
 		        break;
 		    }

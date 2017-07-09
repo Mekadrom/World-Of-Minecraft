@@ -1,13 +1,12 @@
 package com.higgs.wom.block;
 
-import java.util.ArrayList;
-
 import com.higgs.wom.HiggsWom;
 import com.higgs.wom.item.WomItems;
-
 import net.minecraft.block.material.Material;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
 
 public class BlockCopperOre extends WomOre
 {
@@ -17,9 +16,6 @@ public class BlockCopperOre extends WomOre
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockCopperOre");
 		setCreativeTab(HiggsWom.tabWom);
-		setHardness(2.2f);
-		setResistance(6.0f);
-		setHarvestLevel("pickaxe", 0);
 		this.miningLevel = 1;
 	}
 	

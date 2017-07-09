@@ -1,13 +1,12 @@
 package com.higgs.wom.block;
 
-import java.util.ArrayList;
-
 import com.higgs.wom.HiggsWom;
 import com.higgs.wom.item.WomItems;
-
 import net.minecraft.block.material.Material;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
 
 public class BlockFelIronOre extends WomOre
 {
@@ -17,9 +16,7 @@ public class BlockFelIronOre extends WomOre
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockFelIronOre");
 		setCreativeTab(HiggsWom.tabWom);
-		setHardness(2.8f);
-		setResistance(6.0f);
-		setHarvestLevel("pickaxe", 2);
+		this.miningLevel = 275;
 	}
 	
 	@Override
@@ -59,7 +56,7 @@ public class BlockFelIronOre extends WomOre
         
         if(gem1 <= 0.29)
         {
-        	drops.add(new ItemStack(WomItems.itemMoteofFire, world.rand.nextInt(1) + 1));
+        	drops.add(new ItemStack(WomItems.itemMoteOfFire, world.rand.nextInt(1) + 1));
         }
         
         if(gem2 <= 0.06)

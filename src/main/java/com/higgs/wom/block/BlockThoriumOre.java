@@ -1,14 +1,13 @@
 package com.higgs.wom.block;
 
-import java.util.ArrayList;
-
 import com.higgs.wom.HiggsWom;
 import com.higgs.wom.item.WomItems;
-
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
 
 public class BlockThoriumOre extends WomOre
 {
@@ -18,9 +17,7 @@ public class BlockThoriumOre extends WomOre
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockThoriumOre");
 		setCreativeTab(HiggsWom.tabWom);
-		setHardness(2.6f);
-		setResistance(6.0f);
-		setHarvestLevel("pickaxe", 2);
+		this.miningLevel = 230;
 	}
 	
 	@Override

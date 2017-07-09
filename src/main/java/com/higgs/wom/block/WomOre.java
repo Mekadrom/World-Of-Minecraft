@@ -3,7 +3,7 @@ package com.higgs.wom.block;
 import com.higgs.wom.HiggsWom;
 import com.higgs.wom.entitydata.WomPlayerData;
 import com.higgs.wom.item.WomItems;
-import net.minecraft.block.Block;
+import com.higgs.wom.network.WomGuiHandler;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,20 +14,21 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 
-public class WomOre extends Block
+public class WomOre extends WomBlock
 {
 	protected int miningLevel = 1;
+	private EntityPlayer harvestedBy;
 	
 	protected WomOre(Material material)
 	{
 		super(material);
 	}
-	
+
 	protected WomOre(String unlocalizedName, Material material)
 	{
 		super(material);
 		setBlockName(unlocalizedName);
-		setBlockTextureName(HiggsWom.MODID + ":blockWomOre");
+		setBlockTextureName(HiggsWom.MODID + ":" + unlocalizedName);
 		setCreativeTab(HiggsWom.tabWom);
 		setBlockUnbreakable();
 	}
@@ -56,14 +57,33 @@ public class WomOre extends Block
 			{
 				if(hasPickaxe)
 				{
+//					if(!world.isRemote)
+//					{
+//						for(ItemStack itemStack : getDrops(world, x, y, z, 0, 0))
+//						{
+//							EntityItem item = new EntityItem(world, player.posX, player.posY, player.posZ, itemStack);
+//							world.spawnEntityInWorld(item);
+//						}
+//					}
+
+//					WomOreInventory dropping = new WomOreInventory(world, x, y, z, getDrops(world, x, y, z, 0, 0));
+
 					if(!world.isRemote)
 					{
-						for(ItemStack itemStack : getDrops(world, x, y, z, 0, 0))
+						if(HiggsWom.harvestingOreOpensGui)
 						{
-							EntityItem item = new EntityItem(world, player.posX, player.posY, player.posZ, itemStack);
-							world.spawnEntityInWorld(item);
+							player.openGui(HiggsWom.instance, WomGuiHandler.WOM_LOOT_GUI, world, x, y, z);
+						}
+						else
+						{
+							for(ItemStack itemStack : getDrops(world, x, y, z, 0, 0))
+							{
+								EntityItem item = new EntityItem(world, player.posX, player.posY, player.posZ, itemStack);
+								world.spawnEntityInWorld(item);
+							}
 						}
 					}
+
 					world.setBlock(x, y, z, Blocks.stone);
 				}
 				else
