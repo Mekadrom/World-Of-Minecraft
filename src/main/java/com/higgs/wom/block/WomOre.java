@@ -49,7 +49,7 @@ public class WomOre extends WomBlock
 		}
 		if(player instanceof EntityPlayerMP)
 		{
-			if(WomPlayerData.get(player).getMiningSkill() < this.miningLevel)
+			if(player.getDataWatcher().getWatchableObjectInt(WomPlayerData.MINING_WATCHER) < this.miningLevel)
 			{
 				player.addChatMessage(new ChatComponentText("Requires Mining Skill (" + miningLevel + ")."));
 			}

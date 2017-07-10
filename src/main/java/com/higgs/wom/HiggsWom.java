@@ -1,11 +1,10 @@
 package com.higgs.wom;
 
-import com.higgs.wom.client.gui.WomKeyHandler;
+import com.higgs.wom.event.WomEventHandlerCommon;
 import com.higgs.wom.item.WomItems;
-import com.higgs.wom.network.packets.WomPacketMiningLevel;
-import com.higgs.wom.network.packets.WomPacketSyncPlayerData;
+import com.higgs.wom.network.PacketDispatcher;
+import com.higgs.wom.network.WomGuiHandler;
 import com.higgs.wom.proxy.CommonProxy;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -15,15 +14,19 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
 
 @Mod(modid = HiggsWom.MODID, name = HiggsWom.MODNAME, version = HiggsWom.VERSION)
 public class HiggsWom
@@ -32,13 +35,11 @@ public class HiggsWom
     public static final String MODNAME = "Higgs' World of Minecraft";
     public static final String VERSION = "2.0.0";
     
-    public static SimpleNetworkWrapper network;
-    
     public static Configuration config;
     
     public static boolean verboseOutput;
     public static final Logger logger = LogManager.getLogger(MODID);
-    
+
     public static boolean oreCopperVeinSpawns;
     public static int oreCopperVeinSize;
     public static int oreCopperVeinRarity;
@@ -105,7 +106,7 @@ public class HiggsWom
 
     public static boolean harvestingOreOpensGui;
 
-    @SidedProxy(clientSide="com.higgs.wom.proxy.ClientProxy", serverSide="com.higgs.wom.proxy.ServerProxy")
+    @SidedProxy(clientSide="com.higgs.wom.proxy.ClientProxy", serverSide="com.higgs.wom.proxy.CommonProxy")
 	public static CommonProxy proxy;
     
     @Instance
@@ -116,23 +117,40 @@ public class HiggsWom
     {
     	FMLLog.getLogger().info("Higg's World of Minecraft is initializing!");
     	
-    	network = NetworkRegistry.INSTANCE.newSimpleChannel("womChannel");
-    	
-    	network.registerMessage(WomPacketMiningLevel.Handler.class, WomPacketMiningLevel.class, 0, Side.SERVER);
-    	network.registerMessage(WomPacketMiningLevel.Handler.class, WomPacketMiningLevel.class, 1, Side.CLIENT);
-    	network.registerMessage(WomPacketSyncPlayerData.Handler.class, WomPacketSyncPlayerData.class, 2, Side.CLIENT);
+//    	network = NetworkRegistry.INSTANCE.newSimpleChannel("womChannel");
+//
+//    	network.registerMessage(WomPacketSyncPlayerData.Handler.class, WomPacketSyncPlayerData.class, 0, Side.CLIENT);
     	
     	config = new Configuration(e.getSuggestedConfigurationFile());
     	
     	syncConfig();
-    	
+
+        PacketDispatcher.registerPackets();
+
     	proxy.preInit(e);
     }
         
     @EventHandler
     public void init(FMLInitializationEvent e)
     {
-        FMLCommonHandler.instance().bus().register(new WomKeyHandler());
+        ArrayList<WomRecipe> recipes = new ArrayList<WomRecipe>();
+
+        WomRecipe recipe1 = new WomRecipe(new ItemStack(WomItems.itemCopperBar, 1), new int[]{1, 20, 40, 60}, WomRecipe.EnumRecipe.MINING, "Smelt Copper");
+        WomRecipe recipe2 = new WomRecipe(new ItemStack(WomItems.itemTinBar, 1), new int[]{45, 50, 57, 75}, WomRecipe.EnumRecipe.MINING, "Smelt Tin");
+
+        recipe1.addIngredients(new WomItemStack(new ItemStack(WomItems.itemCopperOre, 1)));
+        recipe2.addIngredients(new WomItemStack(new ItemStack(WomItems.itemTinOre, 1)));
+
+        recipes.add(recipe1);
+        recipes.add(recipe2);
+
+        for(WomRecipe r : recipes)
+        {
+            WomRecipe.addRecipe(r);
+        }
+
+        MinecraftForge.EVENT_BUS.register(new WomEventHandlerCommon());
+        NetworkRegistry.INSTANCE.registerGuiHandler(HiggsWom.instance, new WomGuiHandler());
 
         proxy.init(e);
     }
@@ -142,7 +160,7 @@ public class HiggsWom
     {
     	proxy.postInit(e);
     }
-    
+
     public static void syncConfig() //gets called from preinit()
     {
         try
@@ -306,6 +324,11 @@ public class HiggsWom
 			return WomItems.itemPhilosophersStone;
 		}
 	};
+
+    public EntityPlayer getPlayerEntity(MessageContext ctx)
+    {
+        return ctx.getServerHandler().playerEntity;
+    }
     
     public static void log(Level level, String message)
     {

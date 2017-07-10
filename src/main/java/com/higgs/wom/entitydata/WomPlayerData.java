@@ -1,9 +1,7 @@
 package com.higgs.wom.entitydata;
 
-import com.higgs.wom.HiggsWom;
-import com.higgs.wom.network.packets.WomPacketMiningLevel;
-import com.higgs.wom.network.packets.WomPacketSyncPlayerData;
-
+import com.higgs.wom.network.PacketDispatcher;
+import com.higgs.wom.network.client.WomPacketSyncPlayerData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -13,132 +11,132 @@ import net.minecraftforge.common.IExtendedEntityProperties;
 
 public class WomPlayerData implements IExtendedEntityProperties
 {
+	public static final String EXT_PROP_NAME  = "womPlayerData";
+
 	private final EntityPlayer player;
-	public static final String identifier = "womPlayerData";
-	private int mana;
-	private boolean mining;// = false;
+
 	private int miningSkill;// = 0;
-	
+	private final int MINING_MAX_VALUE = 600;
+
+	public static final int MINING_WATCHER = 20;
+
+	/**
+	 * The default constructor takes no arguments, but I put in the Entity
+	 * so I can initialize the above variable 'player'
+ 	 *
+	 * Also, it's best to initialize any other variables you may have added,
+	 * just like in any constructor.
+	 */
 	public WomPlayerData(EntityPlayer player)
 	{
 		this.player = player;
-		this.mana = 100;
+		//start with 0 of every skill. every player starts with the same amount
 		this.miningSkill = 0;
-	}
-	
-	public static WomPlayerData get(EntityPlayer player)
-	{
-	    return (WomPlayerData) player.getExtendedProperties(identifier);
+		this.player.getDataWatcher().addObject(MINING_WATCHER, this.miningSkill);
 	}
 
-	public EntityPlayer getPlayerRef()
+	/**
+	 * Used to register these extended properties for the player during EntityConstructing event
+	 * This method is for convenience only; it will make your code look nicer
+	 */
+	public static final void register(EntityPlayer player)
 	{
-		return this.player;
+		player.registerExtendedProperties(WomPlayerData.EXT_PROP_NAME, new WomPlayerData(player));
 	}
 
-	public void copy(WomPlayerData data)
+	/**
+	 * Returns ExtendedPlayer properties for player
+	 * This method is for convenience only; it will make your code look nicer
+	 */
+	public static final WomPlayerData get(EntityPlayer player)
 	{
-		this.mana = data.getMana();
-		this.miningSkill = data.getMiningSkill();
+		return (WomPlayerData)player.getExtendedProperties(EXT_PROP_NAME);
 	}
 
-	public static void register(EntityPlayer player)
+	/**
+	 * Copies additional player data from the given ExtendedPlayer instance
+	 * Avoids NBT disk I/O overhead when cloning a player after respawn
+	 */
+	public void copy(WomPlayerData props)
 	{
-	    player.registerExtendedProperties(identifier, new WomPlayerData(player));
+		this.miningSkill = props.getMiningSkill();
+		this.player.getDataWatcher().updateObject(MINING_WATCHER, props.getMiningSkill());
+	}
+
+	// Save any custom data that needs saving here
+	@Override
+	public void saveNBTData(NBTTagCompound compound)
+	{
+		// We need to create a new tag compound that will save everything for our Extended Properties
+		NBTTagCompound properties = new NBTTagCompound();
+
+		// We only have 2 variables currently; save them both to the new tag
+		System.out.println("[WOM PROPS] Mining skill saved to NBT: " + miningSkill);
+		properties.setInteger("miningSkill", player.getDataWatcher().getWatchableObjectInt(MINING_WATCHER));
+
+		// Now add our custom tag to the player's tag with a unique name (our property's name)
+		// This will allow you to save multiple types of properties and distinguish between them
+		// If you only have one type, it isn't as important, but it will still avoid conflicts between
+		// your tag names and vanilla tag names. For instance, if you add some "Items" tag,
+		// that will conflict with vanilla. Not good. So just use a unique tag name.
+		compound.setTag(EXT_PROP_NAME, properties);
+
+	}
+
+	// Load whatever data you saved
+	@Override
+	public void loadNBTData(NBTTagCompound compound)
+	{
+		// Here we fetch the unique tag compound we set for this class of Extended Properties
+		NBTTagCompound properties = (NBTTagCompound)compound.getTag(EXT_PROP_NAME);
+		// Get our data from the custom tag compound
+		this.miningSkill = properties.getInteger("miningSkill");
+		player.getDataWatcher().updateObject(MINING_WATCHER, this.miningSkill);
+		// Just so you know it's working, add this line:
+		System.out.println("[WOM PROPS] Mining skill from NBT: " + this.miningSkill);
 	}
 
 	public boolean isServerSide()
 	{
-	    return this.player instanceof EntityPlayerMP;
-	}
-	
-	public void setMana(int mana)
-	{
-	    this.mana = mana;
+		return this.player instanceof EntityPlayerMP;
 	}
 
-	public int getMana()
+	public void syncAll()
 	{
-	    return this.mana;
+		if(!this.isServerSide())
+		{
+			PacketDispatcher.sendToServer(new WomPacketSyncPlayerData(this.player));
+		}
+		else
+		{
+			PacketDispatcher.sendTo(new WomPacketSyncPlayerData(this.player), (EntityPlayerMP)this.player);
+		}
 	}
+
+	/*
+	I personally have yet to find a use for this method. If you know of any,
+	please let me know and I'll add it in!
+	*/
+	@Override
+	public void init(Entity entity, World world) {}
 
 	public boolean getHasMining()
 	{
 		return this.miningSkill == 1;
 	}
 
-	public int getMiningSkill()
+	public final int getMiningSkill()
 	{
-		return this.miningSkill;
+		return player.getDataWatcher().getWatchableObjectInt(MINING_WATCHER);
 	}
 	
-	public void setMiningSkill(int newSkill)
+	public void setMiningSkill(int amount)
 	{
-		this.miningSkill = newSkill;
+		player.getDataWatcher().updateObject(MINING_WATCHER, amount > 0 ? (amount < MINING_MAX_VALUE ? amount : MINING_MAX_VALUE) : 0);
 	}
 	
 	public void incMiningSkill(int amount)
 	{
-		this.miningSkill += amount;
+		player.getDataWatcher().updateObject(MINING_WATCHER, amount > 0 ? ((amount + getMiningSkill()) < MINING_MAX_VALUE ? (amount + getMiningSkill()) : MINING_MAX_VALUE) : 0);
 	}
-	
-	public void syncMiningSkill()
-	{
-	    if(!this.isServerSide())
-	    {
-	        HiggsWom.network.sendToServer(new WomPacketMiningLevel(this.player, this.getMiningSkill()));
-	    }
-	    else
-	    {
-	    	HiggsWom.network.sendTo(new WomPacketMiningLevel(this.player, this.getMiningSkill()), (EntityPlayerMP)this.player);
-	    }
-	}
-
-	public void syncAll()
-	{
-	    if(!this.isServerSide())
-	    {
-	    	HiggsWom.network.sendToServer(new WomPacketSyncPlayerData(this));
-	    }
-	    else
-	    {
-	        HiggsWom.network.sendTo(new WomPacketSyncPlayerData(this), (EntityPlayerMP)this.player);
-	    }
-	}
-
-    @Override
-    public void saveNBTData(NBTTagCompound nbt)
-    {
-    	nbt.setInteger("mana", this.getMana());
-    	nbt.setInteger("miningSkill", this.getMiningSkill());
-    	nbt.setInteger("playerId", this.getPlayerRef().getEntityId());
-    	nbt.setInteger("worldId", this.getPlayerRef().dimension);
-
-		NBTTagCompound properties = new NBTTagCompound();
-
-		properties.setInteger("mana", this.getMana());
-		properties.setInteger("miningSkill", this.getMiningSkill());
-		properties.setInteger("playerId", this.getPlayerRef().getEntityId());
-		properties.setInteger("worldId", this.getPlayerRef().dimension);
-
-		nbt.setTag(identifier, properties);
-    }
-
-    @Override
-    public void loadNBTData(NBTTagCompound nbt)
-    {
-		NBTTagCompound properties = (NBTTagCompound)nbt.getTag(identifier);
-
-		if(properties != null)
-		{
-			this.setMana(properties.getInteger("mana")); //= properties.getInteger("CurrentMana");
-			this.setMiningSkill(properties.getInteger("miningSkill"));// = properties.getInteger("MaxMana");
-		}
-    }
-
-    @Override
-    public void init(Entity entity, World world)
-    {
-    	
-    }
 }

@@ -2,48 +2,42 @@ package com.higgs.wom.event;
 
 import com.higgs.wom.HiggsWom;
 import com.higgs.wom.entitydata.WomPlayerData;
-import com.higgs.wom.network.packets.WomPacketSyncPlayerData;
+import com.higgs.wom.network.PacketDispatcher;
+import com.higgs.wom.network.client.WomPacketSyncPlayerData;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.terraingen.OreGenEvent;
-import org.apache.logging.log4j.Level;
 
 public class WomEventHandlerCommon
 {
 	@SubscribeEvent
-	public void onEntityConstructing(EntityConstructing e)
+	public void onEntityConstructing(EntityConstructing event)
 	{
-		if(e.entity instanceof EntityPlayer && WomPlayerData.get((EntityPlayer) e.entity) == null)
+		if(event.entity instanceof EntityPlayer)
 		{
-			WomPlayerData.register((EntityPlayer)e.entity);
+			if(WomPlayerData.get((EntityPlayer) event.entity) == null)
+			{
+				WomPlayerData.register((EntityPlayer)event.entity);
+			}
 		}
 	}
 
 	@SubscribeEvent
-	public void onEntityJoinWorld(EntityJoinWorldEvent e)
+	public void onEntityJoinWorld(EntityJoinWorldEvent event)
 	{
-		if(e.entity instanceof EntityPlayerMP)
+		if(event.entity instanceof EntityPlayer && !event.entity.worldObj.isRemote)
 		{
-			final EntityPlayerMP entity = (EntityPlayerMP)e.entity;
-			WomPlayerData.get(entity).loadNBTData(new NBTTagCompound());
-			HiggsWom.network.sendTo(new WomPacketSyncPlayerData(entity), entity);
+			PacketDispatcher.sendTo(new WomPacketSyncPlayerData((EntityPlayer)event.entity), (EntityPlayerMP)event.entity);
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void onClonePlayer(PlayerEvent.Clone event)
 	{
+		HiggsWom.logger.info("Cloning player extended properties");
 		WomPlayerData.get(event.entityPlayer).copy(WomPlayerData.get(event.original));
-	}
-
-	@SubscribeEvent
-	public void onOreGen(OreGenEvent e)
-	{
-		HiggsWom.log(Level.INFO, "GOT HERE LUL");
 	}
 }
