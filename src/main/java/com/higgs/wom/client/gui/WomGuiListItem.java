@@ -10,6 +10,9 @@ public class WomGuiListItem
     private boolean highlighted;
     private WomRecipe recipe;
     private boolean craftable = true;
+    private boolean hasSkill;
+    private boolean hasIngredients;
+    private boolean isInvFull;
     private String displayString;
 
     public WomGuiListItem(WomRecipe recipe, int listItemId, int defaultY, String displayString)
@@ -30,6 +33,16 @@ public class WomGuiListItem
         return this.displayString;
     }
 
+    public void setHasSkill(boolean set)
+    {
+        this.hasSkill = set;
+    }
+
+    public boolean getHasSkill()
+    {
+        return this.hasSkill;
+    }
+
     public void setCraftable(boolean set)
     {
         this.craftable = set;
@@ -37,7 +50,12 @@ public class WomGuiListItem
 
     public boolean getCraftable()
     {
-        return this.craftable;
+        return this.hasSkill && this.hasIngredients && !this.isInvFull;
+    }
+
+    public void setIsInvFull(boolean set)
+    {
+        this.isInvFull = set;
     }
 
     public void setDefaultY(int set)
@@ -78,5 +96,15 @@ public class WomGuiListItem
     public void setHighlighted(boolean set)
     {
         this.highlighted = set;
+    }
+
+    public void setHasIngredients(boolean set)
+    {
+        this.hasIngredients = set;
+    }
+
+    public boolean getHasIngredients()
+    {
+        return this.hasIngredients;
     }
 }

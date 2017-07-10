@@ -70,8 +70,8 @@ public class WomPlayerData implements IExtendedEntityProperties
 		// We need to create a new tag compound that will save everything for our Extended Properties
 		NBTTagCompound properties = new NBTTagCompound();
 
+//		HiggsWom.logger.info("Saving mining skill...");
 		// We only have 2 variables currently; save them both to the new tag
-		System.out.println("[WOM PROPS] Mining skill saved to NBT: " + miningSkill);
 		properties.setInteger("miningSkill", player.getDataWatcher().getWatchableObjectInt(MINING_WATCHER));
 
 		// Now add our custom tag to the player's tag with a unique name (our property's name)
@@ -92,8 +92,6 @@ public class WomPlayerData implements IExtendedEntityProperties
 		// Get our data from the custom tag compound
 		this.miningSkill = properties.getInteger("miningSkill");
 		player.getDataWatcher().updateObject(MINING_WATCHER, this.miningSkill);
-		// Just so you know it's working, add this line:
-		System.out.println("[WOM PROPS] Mining skill from NBT: " + this.miningSkill);
 	}
 
 	public boolean isServerSide()
@@ -137,6 +135,13 @@ public class WomPlayerData implements IExtendedEntityProperties
 	
 	public void incMiningSkill(int amount)
 	{
-		player.getDataWatcher().updateObject(MINING_WATCHER, amount > 0 ? ((amount + getMiningSkill()) < MINING_MAX_VALUE ? (amount + getMiningSkill()) : MINING_MAX_VALUE) : 0);
+		if(player.getDataWatcher().getWatchableObjectInt(MINING_WATCHER) + amount <= this.MINING_MAX_VALUE)
+		{
+			player.getDataWatcher().updateObject(MINING_WATCHER, player.getDataWatcher().getWatchableObjectInt(MINING_WATCHER) + amount);
+		}
+		else
+		{
+			player.getDataWatcher().updateObject(MINING_WATCHER, MINING_MAX_VALUE);
+		}
 	}
 }

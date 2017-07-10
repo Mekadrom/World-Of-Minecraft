@@ -51,33 +51,7 @@ public class WomGuiHandler implements IGuiHandler
         }
         else if(ID == WOM_MINING_SKILL_GUI)
         {
-//            if(player instanceof EntityClientPlayerMP)
-//            {
-//                Minecraft mc = Minecraft.getMinecraft();
-//                WorldServer worldServer;
-//
-//                if(Minecraft.getMinecraft().getIntegratedServer() != null)
-//                {
-//                    worldServer = mc.getIntegratedServer().worldServerForDimension(mc.thePlayer.dimension);
-//                }
-//                else
-//                {
-//                    worldServer = MinecraftServer.getServer().worldServerForDimension(mc.thePlayer.dimension);
-//                }
-//
-//                EntityPlayerMP mpPlayer = new EntityPlayerMP(MinecraftServer.getServer(), worldServer, player.getGameProfile(), new ItemInWorldManager(world));
-//                return new WomGuiMiningSkill(mpPlayer);
-//            }
-
-//            if(mpPlayer != null)
-//            {
-//                return new WomGuiMiningSkill(mpPlayer);
-//            }
-//            else
-//            {
-//                HiggsWom.logger.error("Not an EntityPlayerMP.");
-                return new WomGuiMiningSkill(player);
-//            }
+            return new WomGuiMiningSkill(player);
         }
 
         return null;

@@ -96,4 +96,6 @@ tile.blockFelIronOre.name=Fel Iron Ore
 tile.blockFirebloomFlower.name=Firebloom
 tile.blockPurpleLotusFlower.name=Purple Lotus
 
+tile.TESTBLOCK.name=Gui Testing Block
+
 itemGroup.tabWom=§6World of Minecraft§r

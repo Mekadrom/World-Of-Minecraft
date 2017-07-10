@@ -1,11 +1,17 @@
 package com.higgs.wom.client.gui;
 
 import com.higgs.wom.HiggsWom;
+import com.higgs.wom.WomItemStack;
 import com.higgs.wom.WomRecipe;
 import com.higgs.wom.entitydata.WomPlayerData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
@@ -15,7 +21,11 @@ import java.util.ArrayList;
 @SideOnly(Side.CLIENT)
 public class WomGuiMiningSkill extends WomGuiWindow
 {
-    ArrayList<WomGuiListItem> listItems = new ArrayList<WomGuiListItem>();
+    private ArrayList<WomGuiListItem> listItems = new ArrayList<WomGuiListItem>();
+    private WomGuiListItem selected = null;
+    private int craftingButtonState;
+    private int craftingAllButtonState;
+    private int craftingExitButtonState;
 
     public WomGuiMiningSkill(EntityPlayer player)
     {
@@ -32,7 +42,6 @@ public class WomGuiMiningSkill extends WomGuiWindow
     {
         super.initGui();
 
-//        int x = 9;
         int y = 0;
 
         int index = 0;
@@ -41,7 +50,6 @@ public class WomGuiMiningSkill extends WomGuiWindow
         for(WomRecipe recipe : WomRecipe.getRecipes(WomRecipe.EnumRecipe.MINING))
         {
             this.listItems.add(new WomGuiListItem(recipe, index, y + (index * defaultListItemWidth), recipe.getDisplayName()));
-
             index++;
         }
     }
@@ -49,6 +57,11 @@ public class WomGuiMiningSkill extends WomGuiWindow
     @Override
     protected void drawGuiContainerBackgroundLayer(float depth, int mouseX, int mouseY)
     {
+        if(this.selected == null)
+        {
+            this.craftingButtonState = -1;
+        }
+
         GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         if(dragging)
@@ -58,45 +71,73 @@ public class WomGuiMiningSkill extends WomGuiWindow
 
         this.mc.getTextureManager().bindTexture(new ResourceLocation(HiggsWom.MODID + ":textures/gui/guiWindowSkill.png"));
 
-        drawTexturedModalRect(displayX + dragX, displayY + dragY, 0, 0, 256, 256);
+        drawTexturedModalRect(getGuiX(), getGuiY(), 0, 0, 256, 256);
 
         this.mc.getTextureManager().bindTexture(new ResourceLocation(HiggsWom.MODID + ":textures/gui/guiWindowElements.png"));
 
-        drawTexturedModalRect(displayX + dragX + 4, displayY + dragY + 2, 0, 64, 16, 16);
+        drawTexturedModalRect(getGuiX() + 4, getGuiY() + 2, 0, 64, 16, 16);
 
-        this.fontRendererObj.drawString(title, displayX + dragX - (fontRendererObj.getStringWidth(title) / 2) + 129, displayY + dragY + 2, 0x917719);
+        this.fontRendererObj.drawString(title, getGuiX() - (fontRendererObj.getStringWidth(title) / 2) + 129, getGuiY() + 2, 0xf4d442);
 
+        this.mc.getTextureManager().bindTexture(new ResourceLocation(HiggsWom.MODID + ":textures/gui/guiWindowElements.png"));
+
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glDisable(GL11.GL_LIGHTING);
         int miningSkill = playerData.getMiningSkill();
-
         String skillLevelString = miningSkill + "/";
-
         if(miningSkill <= 75)
         {
+            drawSkillBar(miningSkill, 75);
             skillLevelString += "75";
         }
-        else if(miningSkill > 75 && miningSkill < 150)
+        else if(miningSkill > 75 && miningSkill <= 150)
         {
+            drawSkillBar(miningSkill, 150);
             skillLevelString += "150";
         }
-        else
+        else if(miningSkill > 150 && miningSkill <= 225)
         {
-            skillLevelString += "NaN";
+            drawSkillBar(miningSkill, 225);
+            skillLevelString += "225";
         }
-
-        this.fontRendererObj.drawString(skillLevelString, displayX + dragX - (fontRendererObj.getStringWidth(title) / 2) + 131, displayY + dragY + 14, 0xffffff);
+        else if(miningSkill > 225 && miningSkill <= 300)
+        {
+            drawSkillBar(miningSkill, 300);
+            skillLevelString += "300";
+        }
+        this.fontRendererObj.drawString(skillLevelString, getGuiX() - (fontRendererObj.getStringWidth(title) / 2) + 127, getGuiY() + 14, 0xffffff);
 
         this.mc.getTextureManager().bindTexture(new ResourceLocation(HiggsWom.MODID + ":textures/gui/guiWindowElements.png"));
 
         if(this.closeButtonDepressed)
         {
-            drawTexturedModalRect(displayX + dragX + (249), displayY + dragY + (3), 49, 64, 8, 8);
+            drawTexturedModalRect(getGuiX() + (249), getGuiY() + (3), 49, 64, 8, 8);
         }
         else
         {
-            drawTexturedModalRect(displayX + dragX + (249), displayY + dragY + (2), 49, 64, 8, 8);
+            drawTexturedModalRect(getGuiX() + (249), getGuiY() + (2), 49, 64, 8, 8);
         }
 
-//        drawTexturedModalRect(displayX + dragX + 4, displayY + dragY + 2, 0, 64, 16, 16);
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        this.mc.getTextureManager().bindTexture(new ResourceLocation(HiggsWom.MODID + ":textures/gui/guiWindowElements.png"));
+
+        drawCraftingButtons();
+
+        if(this.player.inventory.getFirstEmptyStack() == -1)
+        {
+            if(this.selected != null)
+            {
+                selected.setIsInvFull(true);
+            }
+        }
+        else
+        {
+            if(this.selected != null)
+            {
+                selected.setIsInvFull(false);
+            }
+        }
+
         drawListItems(mouseX, mouseY);
     }
 
@@ -119,7 +160,58 @@ public class WomGuiMiningSkill extends WomGuiWindow
         }
     }
 
-    public void drawListItems(int mouseX, int mouseY)
+    private void drawCraftingButtons()
+    {
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+        if(this.craftingButtonState == -1)
+        {
+            drawTexturedModalRect(getGuiX() + 192, getGuiY() + 181, 0, 121, 29, 8);
+        }
+        else if(this.craftingButtonState == 0)
+        {
+            drawTexturedModalRect(getGuiX() + 192, getGuiY() + 181, 0, 112, 29, 8);
+        }
+        else if(this.craftingButtonState == 1)
+        {
+            drawTexturedModalRect(getGuiX() + 192, getGuiY() + 180, 0, 112, 29, 8);
+        }
+
+        if(this.craftingAllButtonState == -1)
+        {
+            drawTexturedModalRect(getGuiX() + 130, getGuiY() + 181, 0, 139, 30, 8);
+        }
+        else if(this.craftingAllButtonState == 0)
+        {
+            drawTexturedModalRect(getGuiX() + 130, getGuiY() + 181, 0, 130, 30, 8);
+        }
+        else if(this.craftingAllButtonState == 1)
+        {
+            drawTexturedModalRect(getGuiX() + 130, getGuiY() + 180, 0, 130, 30, 8);
+        }
+
+        if(this.craftingExitButtonState == -1)
+        {
+            drawTexturedModalRect(getGuiX() + 224, getGuiY() + 181, 0, 157, 29, 8);
+        }
+        else if(this.craftingExitButtonState == 0)
+        {
+            drawTexturedModalRect(getGuiX() + 224, getGuiY() + 181, 0, 148, 29, 8);
+        }
+        else if(this.craftingExitButtonState == 1)
+        {
+            drawTexturedModalRect(getGuiX() + 224, getGuiY() + 180, 0, 148, 29, 8);
+        }
+    }
+
+    private void drawSkillBar(int skill, int max)
+    {
+        int rightmostBound = map(skill, max, 171);
+
+        drawTexturedModalRect(getGuiX() + 44, getGuiY() + 14, 0, 0, rightmostBound, 7);
+    }
+
+    private void drawListItems(int mouseX, int mouseY)
     {
         int skillLevel = player.getDataWatcher().getWatchableObjectInt(WomPlayerData.MINING_WATCHER);//WomPlayerData.get(player).getMiningSkill();
 
@@ -133,27 +225,29 @@ public class WomGuiMiningSkill extends WomGuiWindow
                 if(skillLevel < listItem.getRecipe().getMaxSkillUpLevel())
                 {
                     listItemBoxColor = new Color(0xff, 0x00, 0x00, 0xb0);//boxColor = 16711680;//0xff0000ff; //red
-                    listItem.setCraftable(false);
+                    listItem.setHasSkill(false);
                 }
                 else if(skillLevel >= listItem.getRecipe().getMaxSkillUpLevel() && skillLevel < listItem.getRecipe().getMedSkillUpLevel())
                 {
                     listItemBoxColor = new Color(0xd3, 0x6d, 0x00, 0xb0);//boxColor = 13856000;//0xd36d0050; //orange
-                    listItem.setCraftable(true);
+                    listItem.setHasSkill(true);
                 }
                 else if(skillLevel >= listItem.getRecipe().getMedSkillUpLevel() && skillLevel < listItem.getRecipe().getMinSkillUpLevel())
                 {
                     listItemBoxColor = new Color(0xff, 0xff, 0x00, 0xb0);//boxColor = 16776969;//0xffff0950; //yellow
-                    listItem.setCraftable(true);
+                    listItem.setHasSkill(true);
                 }
                 else if(skillLevel >= listItem.getRecipe().getMinSkillUpLevel() && skillLevel < listItem.getRecipe().getNoSkillUpLevel())
                 {
                     listItemBoxColor = new Color(0x01, 0x89, 0x01, 0xb0);//boxColor = 100609;//0x01890150; //green
-                    listItem.setCraftable(true);
+                    listItem.setHasSkill(true);
                 }
                 else
                 {
                     listItemBoxColor = new Color(0x4f, 0x4f, 0x4f, 0xb0);//boxColor = 5197647;//0x4f4f4f50; //grey
                 }
+
+                drawCraftingRecipeAndCheckForIngredients(listItem);
 
                 textColor = new Color(0xff, 0xff, 0xff, 0xff);//textColor = 16777215;//0xffffff; //white
             }
@@ -171,26 +265,27 @@ public class WomGuiMiningSkill extends WomGuiWindow
                 if(skillLevel < listItem.getRecipe().getMaxSkillUpLevel())
                 {
                     textColor = new Color(0xff, 0x00, 0x00, 0xff);//textColor = 16711680;//0xff0000ff; //red
-                    listItem.setCraftable(false);
+                    listItem.setHasSkill(false);
                 }
                 else if(skillLevel >= listItem.getRecipe().getMaxSkillUpLevel() && skillLevel < listItem.getRecipe().getMedSkillUpLevel())
                 {
                     textColor = new Color(0xd3, 0x6d, 0x00, 0xff);//textColor = 13856000;//0xd36d00ff; //orange
-                    listItem.setCraftable(true);
+                    listItem.setHasSkill(true);
                 }
                 else if(skillLevel >= listItem.getRecipe().getMedSkillUpLevel() && skillLevel < listItem.getRecipe().getMinSkillUpLevel())
                 {
                     textColor = new Color(0xff, 0xff, 0x00, 0xff);//textColor = 16776960;//0xffff00ff; //yellow
-                    listItem.setCraftable(true);
+                    listItem.setHasSkill(true);
                 }
                 else if(skillLevel >= listItem.getRecipe().getMinSkillUpLevel() && skillLevel < listItem.getRecipe().getNoSkillUpLevel())
                 {
                     textColor = new Color(0x01, 0x89, 0x01, 0xff);//textColor = 100609;//0x018901ff; //green
-                    listItem.setCraftable(true);
+                    listItem.setHasSkill(true);
                 }
                 else
                 {
                     textColor = new Color(0x4f, 0x4f, 0x4f, 0xff);//textColor = 5197647;//0x4f4f4fff; //grey
+                    listItem.setHasSkill(true);
                 }
             }
 
@@ -210,10 +305,77 @@ public class WomGuiMiningSkill extends WomGuiWindow
                 listItem.setHighlighted(false);
             }
 
-            drawRect(displayX + dragX + 5, displayY + dragY + listItem.getDefaultY() + scrollY + 35,
-                    displayX + dragX + 117, displayY + dragY + listItem.getDefaultY() + scrollY + 35 + 11, listItemBoxColor.getRGB());
-            fontRendererObj.drawString(listItem.getDisplayString(), displayX + dragX + 11, displayY + dragY + scrollY + listItem.getDefaultY() + 36, textColor.getRGB(), true);
+            drawRect(getGuiX() + 5, getGuiY() + listItem.getDefaultY() + scrollY + 35,
+                    getGuiX() + 117, getGuiY() + listItem.getDefaultY() + scrollY + 35 + 11, listItemBoxColor.getRGB());
+            fontRendererObj.drawString(listItem.getDisplayString(), getGuiX() + 11, getGuiY() + scrollY + listItem.getDefaultY() + 36, textColor.getRGB(), true);
         }
+    }
+
+    private void drawCraftingRecipeAndCheckForIngredients(WomGuiListItem listItem)
+    {
+        WomRecipe recipe = listItem.getRecipe();
+
+        this.mc.getTextureManager().bindTexture(new ResourceLocation(HiggsWom.MODID + ":textures/gui/guiWindowElements.png"));
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        drawTexturedModalRect(getGuiX() + 133, getGuiY() + 42, 48, 80, 19, 19);
+        guiDrawItemIcon(recipe.getResult(), getGuiX() + 135, getGuiY() + 43);
+
+        fontRendererObj.drawString("Requires: forge.", getGuiX() + 134, getGuiY() + 64, 0xf3d442, true);
+        fontRendererObj.drawString("Reagents:", getGuiX() + 134, getGuiY() + 76, 0xf3d442, true);
+        fontRendererObj.drawString(recipe.getResult().getDisplayName(), getGuiX() + 160, getGuiY() + 44, 0xf4d442, true);
+
+        int yOffset = 55;
+
+        for(WomItemStack womItemStack : recipe.getIngredients())
+        {
+            this.mc.getTextureManager().bindTexture(new ResourceLocation(HiggsWom.MODID + ":textures/gui/guiWindowElements.png"));
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            drawTexturedModalRect(getGuiX() + 133, getGuiY() + yOffset + 32, 48, 80, 19, 19);
+            drawTexturedModalRect(getGuiX() + 151, getGuiY() + yOffset + 33, 48, 104, 53, 21);
+            fontRendererObj.drawSplitString(womItemStack.getItemStack().getDisplayName(), getGuiX() + 156, getGuiY() + yOffset + 33, 40, 0xffffff);
+            guiDrawItemIcon(womItemStack.getItemStack(), getGuiX() + 134, getGuiY() + yOffset + 32);
+
+            yOffset += 35;
+        }
+
+        InventoryPlayer inventory = player.inventory;
+
+        boolean[] args = new boolean[selected.getRecipe().getIngredients().size()];
+
+        for(boolean bool : args)
+        {
+            bool = false;
+        }
+
+        for(int i = 0; i < inventory.getSizeInventory(); i++)
+        {
+            ItemStack stackInSlot = inventory.getStackInSlot(i);
+
+            for(int j = 0; j < selected.getRecipe().getIngredients().size(); j++)
+            {
+                WomItemStack womItemStack = selected.getRecipe().getIngredients().get(j);
+
+                if(stackInSlot != null && womItemStack != null)
+                {
+                    if(stackInSlot.getItem() == womItemStack.getItemStack().getItem() && stackInSlot.stackSize >= womItemStack.getItemStack().stackSize)
+                    {
+                        args[j] = true;
+                    }
+                }
+            }
+        }
+
+        selected.setHasIngredients(areAllTrue(args));
+    }
+
+    private void guiDrawItemIcon(ItemStack item, int x, int y)
+    {
+        this.mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        IIcon icon = item.getItem().getIcon(item, 0);
+        GL11.glEnable(GL11.GL_BLEND);
+        this.drawTexturedModelRectFromIcon(x, y, icon, 16, 16);
+        GL11.glDisable(GL11.GL_BLEND);
     }
 
     public void scrollUp()
@@ -226,20 +388,11 @@ public class WomGuiMiningSkill extends WomGuiWindow
         scrollY += scrollIncrement;
     }
 
-    public int map(int toMap, int toMapHighBound, int mapHighBound)
+    private int map(int toMap, int toMapHighBound, int mapHighBound)
     {
-        int map;
+        double mapDiv = (double)toMap / (double)toMapHighBound;
 
-        map = toMap / toMapHighBound;
-
-        map *= mapHighBound;
-
-        return map;
-    }
-
-    public static boolean isInRect(int x, int y, int xSize, int ySize, int mouseX, int mouseY)
-    {
-        return ((mouseX >= x && mouseX <= x + xSize) && (mouseY >= y && mouseY <= y + ySize));
+        return (int)(mapDiv * (double)mapHighBound);
     }
 
     /**
@@ -250,24 +403,74 @@ public class WomGuiMiningSkill extends WomGuiWindow
     {
         super.mouseClicked(mouseX, mouseY, button);
 
-        if(isInRect(displayX + dragX + 46, displayY + dragY + 6, 400, 14, mouseX, mouseY))
+        if(isInDragArea(mouseX, mouseY))
         {
             dragging = true;
             lastDragX = mouseX - dragX;
             lastDragY = mouseY - dragY;
         }
-        else if(isInRect(displayX + dragX + 255, displayY + dragY + 2, 7, 7, mouseX, mouseY))
+        else if(isInXButtonArea(mouseX, mouseY))
         {
             dragging = false;
-//            WomPlayerData.get(this.player).incMiningSkill(5);
             player.getDataWatcher().updateObject(WomPlayerData.MINING_WATCHER, player.getDataWatcher().getWatchableObjectInt(WomPlayerData.MINING_WATCHER) + 1);
             WomPlayerData.get(this.player).syncAll();
             this.closeButtonDepressed = true;
+        }
+        else if(isInCraftingButtonArea(mouseX, mouseY))
+        {
+            if(isOnCreateButton(mouseX, mouseY))
+            {
+                dragging = false;
+                if(this.selected != null)
+                {
+                    if(selected.getCraftable())
+                    {
+                        craftCurrentRecipe();
+                    }
+                }
+                this.craftingButtonState = 0;
+                this.craftingAllButtonState = 1;
+                this.craftingExitButtonState = 1;
+                this.closeButtonDepressed = false;
+            }
+            else if(isOnCreateAllButton(mouseX, mouseY))
+            {
+                dragging = false;
+                if(this.selected != null)
+                {
+                    while(selected.getCraftable())
+                    {
+                        craftCurrentRecipe();
+                    }
+                }
+                this.craftingButtonState = 1;
+                this.craftingAllButtonState = 0;
+                this.craftingExitButtonState = 1;
+                this.closeButtonDepressed = false;
+            }
+            else if(isOnCreateExitButton(mouseX, mouseY))
+            {
+                dragging = false;
+                if(this.selected != null)
+                {
+                    while(selected.getCraftable())
+                    {
+                        craftCurrentRecipe();
+                    }
+                }
+                this.craftingButtonState = 1;
+                this.craftingAllButtonState = 1;
+                this.craftingExitButtonState = 0;
+                this.closeButtonDepressed = false;
+            }
         }
         else
         {
             dragging = false;
             this.closeButtonDepressed = false;
+            this.craftingButtonState = 1;
+            this.craftingAllButtonState = 1;
+            this.craftingExitButtonState = 1;
         }
 
         if(isInListItemArea(mouseX, mouseY))
@@ -277,6 +480,7 @@ public class WomGuiMiningSkill extends WomGuiWindow
                 if(isInListItem(listItem.getDefaultY(), mouseX, mouseY))
                 {
                     listItem.setSelected(true);
+                    this.selected = listItem;
                 }
                 else
                 {
@@ -284,12 +488,18 @@ public class WomGuiMiningSkill extends WomGuiWindow
                 }
             }
         }
+        else if(isInButtonsArea(mouseX, mouseY))
+        {
+
+        }
         else
         {
             for(WomGuiListItem listItem : this.listItems)
             {
                 listItem.setSelected(false);
             }
+
+            this.selected = null;
         }
     }
 
@@ -300,7 +510,10 @@ public class WomGuiMiningSkill extends WomGuiWindow
     @Override
     protected void mouseClickMove(int mouseX, int mouseY, int lastButtonClicked, long timeSinceMouseClick)
     {
+        if(isInListItemScrollArea(mouseX, mouseY))
+        {
 
+        }
     }
 
     /**
@@ -314,34 +527,201 @@ public class WomGuiMiningSkill extends WomGuiWindow
 
         if(which == 0)
         {
-            if(isInRect(displayX + dragX + 248, displayY + dragY + 2, 7, 7, mouseX, mouseY))
+            if(isInXButtonArea(mouseX, mouseY))
             {
-                this.mc.thePlayer.closeScreen();
+                this.player.closeScreen();
                 this.closeButtonDepressed = false;
+            }
+            else if(isInCraftingButtonArea(mouseX, mouseY))
+            {
+                this.craftingButtonState = 1;
+            }
+            else if(isOnCreateAllButton(mouseX, mouseY))
+            {
+                this.craftingAllButtonState = 1;
+            }
+            else if(isOnCreateExitButton(mouseX, mouseY))
+            {
+                this.craftingExitButtonState = 1;
+                this.player.closeScreen();
             }
 
             dragging = false;
         }
+    }
 
-        if(isInListItemArea(mouseX, mouseY))
+    private void craftCurrentRecipe()
+    {
+        InventoryPlayer inventoryPlayer = player.inventory;
+        Item resultItem = selected.getRecipe().getResult().getItem();
+        int resultAmount = selected.getRecipe().getResultAmount();
+
+        if(player.worldObj.isRemote)
         {
-            for(WomGuiListItem listItem : this.listItems)
+            for(int i = 9; i < inventoryPlayer.getSizeInventory(); i++)
             {
-                if(isInListItem(listItem.getDefaultY(), mouseX, mouseY))
-                {
+                ItemStack stackInSlot = inventoryPlayer.getStackInSlot(i);
 
+                //taking ingredients
+                for(WomItemStack womItemStack : selected.getRecipe().getIngredients())
+                {
+                    ItemStack wom = womItemStack.getItemStack();
+
+                    if(stackInSlot != null)
+                    {
+                        if(Item.getIdFromItem(stackInSlot.getItem()) == Item.getIdFromItem(wom.getItem()) && stackInSlot.stackSize >= wom.stackSize)
+                        {
+                            if(stackInSlot.stackSize == wom.stackSize)
+                            {
+                                inventoryPlayer.setInventorySlotContents(i, null);
+                            }
+                            else
+                            {
+                                inventoryPlayer.setInventorySlotContents(i, new ItemStack(stackInSlot.getItem(), stackInSlot.stackSize - wom.stackSize));
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            for(int i = 9; i < inventoryPlayer.getSizeInventory(); i++)
+            {
+                //adding result
+                ItemStack stackInSlot = inventoryPlayer.getStackInSlot(i);
+
+                if(stackInSlot == null)
+                {
+                    inventoryPlayer.setInventorySlotContents(i, new ItemStack(resultItem, resultAmount));
+                    break;
+                }
+                else
+                {
+                    if(Item.getIdFromItem(stackInSlot.getItem()) == Item.getIdFromItem(resultItem))
+                    {
+                        inventoryPlayer.setInventorySlotContents(i, new ItemStack(resultItem, stackInSlot.stackSize + resultAmount));
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
             }
         }
+
+        determineSkillUp();
     }
 
-    public boolean isInListItemArea(int mouseX, int mouseY)
+    private void determineSkillUp()
     {
-        return isInRect(displayX + dragX + 9, displayY + dragY + 36, 113, 149, mouseX, mouseY);
+        int skillLevel = player.getDataWatcher().getWatchableObjectInt(WomPlayerData.MINING_WATCHER);//WomPlayerData.get(player).getMiningSkill();
+
+
+        if(skillLevel < selected.getRecipe().getMaxSkillUpLevel())
+        {
+            HiggsWom.logger.error("Cannot craft recipe; you should not be getting this.");
+        }
+        else if(skillLevel >= selected.getRecipe().getMaxSkillUpLevel() && skillLevel < selected.getRecipe().getMedSkillUpLevel())
+        {
+            WomPlayerData.get(player).incMiningSkill(1);
+            WomPlayerData.get(this.player).syncAll();
+        }
+        else if(skillLevel >= selected.getRecipe().getMedSkillUpLevel() && skillLevel < selected.getRecipe().getMinSkillUpLevel())
+        {
+            float rand = player.worldObj.rand.nextFloat();
+
+            WomPlayerData.get(player).incMiningSkill(rand < 0.5 ? 1 : 0);
+            WomPlayerData.get(this.player).syncAll();
+        }
+        else if(skillLevel >= selected.getRecipe().getMinSkillUpLevel() && skillLevel < selected.getRecipe().getNoSkillUpLevel())
+        {
+            float rand = player.worldObj.rand.nextFloat();
+
+            WomPlayerData.get(player).incMiningSkill(rand < 0.25 ? 1 : 0);
+            WomPlayerData.get(this.player).syncAll();
+        }
+        else
+        {
+            WomPlayerData.get(player).incMiningSkill(0);
+            WomPlayerData.get(this.player).syncAll();
+        }
     }
 
-    public boolean isInListItem(int listItemDefaultY, int mouseX, int mouseY)
+    private int getGuiX()
     {
-        return isInRect(displayX + dragX + 9, displayY + dragY + listItemDefaultY + scrollY + 36, 113, 8, mouseX, mouseY);
+        return displayX + dragX;
+    }
+
+    private int getGuiY()
+    {
+        return displayY + dragY;
+    }
+
+    private static boolean areAllTrue(boolean[] array)
+    {
+        for(boolean b : array)
+        {
+            if(!b)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isInRect(int x, int y, int xSize, int ySize, int mouseX, int mouseY)
+    {
+        return ((mouseX >= x && mouseX <= x + xSize) && (mouseY >= y && mouseY <= y + ySize));
+    }
+
+    private boolean isInListItemArea(int mouseX, int mouseY)
+    {
+        return isInRect(getGuiX() + 9, getGuiY() + 36, 113, 149, mouseX, mouseY);
+    }
+
+    private boolean isInListItem(int listItemDefaultY, int mouseX, int mouseY)
+    {
+        return isInRect(getGuiX() + 9, getGuiY() + listItemDefaultY + scrollY + 36, 113, 8, mouseX, mouseY);
+    }
+
+    private boolean isInCraftingButtonArea(int mouseX, int mouseY)
+    {
+        return isInRect(getGuiX() + 128, getGuiY() + 181, 127, 9, mouseX, mouseY);
+    }
+
+    public boolean isOnCreateButton(int mouseX, int mouseY)
+    {
+        return isInRect(getGuiX() + 192, getGuiY() + 179, 29, 9, mouseX, mouseY);
+    }
+
+    public boolean isOnCreateAllButton(int mouseX, int mouseY)
+    {
+        return isInRect(getGuiX() + 129, getGuiY() + 181, 30, 9, mouseX, mouseY);
+    }
+
+    private boolean isInListItemScrollArea(int mouseX, int mouseY)
+    {
+        return isInRect(getGuiX() + 119, getGuiY() + 40, 7, 141, mouseX, mouseY);
+    }
+
+    private boolean isInDragArea(int mouseX, int mouseY)
+    {
+        return isInRect(getGuiX() + 23, getGuiY() + 1, 224, 9, mouseX, mouseY);
+    }
+
+    private boolean isInXButtonArea(int mouseX, int mouseY)
+    {
+        return isInRect(getGuiX() + 248, getGuiY() + 3, 7, 7, mouseX, mouseY);
+    }
+
+    private boolean isInButtonsArea(int mouseX, int mouseY)
+    {
+        return isInRect(getGuiX() + 128, getGuiY() + 178, 127, 12, mouseX, mouseY);
+    }
+
+    private boolean isOnCreateExitButton(int mouseX, int mouseY)
+    {
+        return isInRect(getGuiX() + 224, getGuiY() + 181, 29, 9, mouseX, mouseY);
     }
 }

@@ -88,7 +88,7 @@ public class WomOre extends WomBlock
 				}
 				else
 				{
-					player.addChatMessage(new ChatComponentText("Requires a Warcraft Pickaxe."));
+					player.addChatMessage(new ChatComponentText("Requires a Miner's Pick."));
 				}
 			}
 		}
