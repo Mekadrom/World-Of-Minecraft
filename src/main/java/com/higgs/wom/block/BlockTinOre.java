@@ -16,6 +16,7 @@ public class BlockTinOre extends WomOre
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockTinOre");
 		setCreativeTab(HiggsWom.tabWom);
+        setBlockUnbreakable();
         this.levels = new int[]{50, 90, 115, 165};
 	}
 	

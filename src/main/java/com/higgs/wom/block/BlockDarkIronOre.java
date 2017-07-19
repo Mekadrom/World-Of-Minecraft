@@ -16,6 +16,7 @@ public class BlockDarkIronOre extends WomOre
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockDarkIronOre");
 		setCreativeTab(HiggsWom.tabWom);
+        setBlockUnbreakable();
         this.levels = new int[]{230, 255, 280, 330};
 	}
 	

@@ -16,6 +16,7 @@ public class BlockTruesilverOre extends WomOre
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockTruesilverOre");
 		setCreativeTab(HiggsWom.tabWom);
+        setBlockUnbreakable();
         this.levels = new int[]{205, 255, 280, 330};
 	}
 	

@@ -17,6 +17,7 @@ public class BlockThoriumOre extends WomOre
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockThoriumOre");
 		setCreativeTab(HiggsWom.tabWom);
+        setBlockUnbreakable();
         this.levels = new int[]{230, 270, 280, 345};
 	}
 	
