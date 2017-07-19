@@ -31,7 +31,7 @@ public class HiggsWom
 {
     public static final String MODID = "wom";
     public static final String MODNAME = "Higgs' World of Minecraft";
-    public static final String VERSION = "2.0.3";
+    public static final String VERSION = "2.0.4";
     
     public static Configuration config;
     

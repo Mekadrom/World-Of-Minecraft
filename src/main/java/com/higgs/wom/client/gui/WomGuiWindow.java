@@ -1,7 +1,7 @@
 package com.higgs.wom.client.gui;
 
 import com.higgs.wom.entitydata.WomPlayerData;
-import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
@@ -10,7 +10,7 @@ import net.minecraft.inventory.Container;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-public /*abstract*/ class WomGuiWindow extends GuiContainer
+public /*abstract*/ class WomGuiWindow extends GuiScreen//Container
 {
     /** The X size of the window in pixels. */
     public int xSize;
@@ -42,7 +42,7 @@ public /*abstract*/ class WomGuiWindow extends GuiContainer
 
     public WomGuiWindow(Container container)
     {
-        super(container);
+//        super(container);
     }
 
     /**
