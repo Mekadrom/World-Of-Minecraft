@@ -2,6 +2,7 @@ package com.higgs.wom.network;
 
 import com.higgs.wom.HiggsWom;
 import com.higgs.wom.network.client.WomPacketSyncPlayerData;
+import com.higgs.wom.network.server.WomPacketDropExcessCrafting;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
@@ -51,6 +52,7 @@ public class PacketDispatcher
 //
 //        // Packets handled on SERVER
 //        registerMessage(OpenGuiMessage.class);
+        registerMessage(WomPacketDropExcessCrafting.class);
 //
 //        // If you don't want to make a 'registerMessage' method, you can do it directly:
 //        //PacketDispatcher.dispatcher.registerMessage(SyncPlayerPropsMessage.class, SyncPlayerPropsMessage.class, packetId++, Side.CLIENT);

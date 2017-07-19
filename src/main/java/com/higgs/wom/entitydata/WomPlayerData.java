@@ -15,10 +15,17 @@ public class WomPlayerData implements IExtendedEntityProperties
 
 	private final EntityPlayer player;
 
-	private int miningSkill;// = 0;
-	private final int MINING_MAX_VALUE = 600;
+	private int miningSkill;
+	private int herbalismSkill;
+	private int jewelcraftingSkill;
 
-	public static final int MINING_WATCHER = 20;
+	private final int MINING_MAX_VALUE = 600;
+	private final int HERBALISM_MAX_VALUE = 600;
+	private final int JEWELCRAFTING_MAX_VALUE = 600;
+
+	public static final int MINING_WATCHER = 21;
+	public static final int HERBALISM_WATCHER = 22;
+	public static final int JEWELCRAFTING_WATCHER = 23;
 
 	/**
 	 * The default constructor takes no arguments, but I put in the Entity
@@ -32,7 +39,11 @@ public class WomPlayerData implements IExtendedEntityProperties
 		this.player = player;
 		//start with 0 of every skill. every player starts with the same amount
 		this.miningSkill = 0;
+		this.herbalismSkill = 0;
+		this.jewelcraftingSkill = 0;
 		this.player.getDataWatcher().addObject(MINING_WATCHER, this.miningSkill);
+		this.player.getDataWatcher().addObject(HERBALISM_WATCHER, this.herbalismSkill);
+		this.player.getDataWatcher().addObject(JEWELCRAFTING_WATCHER, this.jewelcraftingSkill);
 	}
 
 	/**
@@ -60,7 +71,12 @@ public class WomPlayerData implements IExtendedEntityProperties
 	public void copy(WomPlayerData props)
 	{
 		this.miningSkill = props.getMiningSkill();
+		this.herbalismSkill = props.getHerbalismSkill();
+		this.jewelcraftingSkill = props.getJewelcraftingSkill();
+
 		this.player.getDataWatcher().updateObject(MINING_WATCHER, props.getMiningSkill());
+		this.player.getDataWatcher().updateObject(HERBALISM_WATCHER, props.getHerbalismSkill());
+		this.player.getDataWatcher().updateObject(JEWELCRAFTING_WATCHER, props.getJewelcraftingSkill());
 	}
 
 	// Save any custom data that needs saving here
@@ -73,6 +89,8 @@ public class WomPlayerData implements IExtendedEntityProperties
 //		HiggsWom.logger.info("Saving mining skill...");
 		// We only have 2 variables currently; save them both to the new tag
 		properties.setInteger("miningSkill", player.getDataWatcher().getWatchableObjectInt(MINING_WATCHER));
+		properties.setInteger("herbalismSkill", player.getDataWatcher().getWatchableObjectInt(HERBALISM_WATCHER));
+		properties.setInteger("jewelcraftingSkill", player.getDataWatcher().getWatchableObjectInt(JEWELCRAFTING_WATCHER));
 
 		// Now add our custom tag to the player's tag with a unique name (our property's name)
 		// This will allow you to save multiple types of properties and distinguish between them
@@ -91,7 +109,12 @@ public class WomPlayerData implements IExtendedEntityProperties
 		NBTTagCompound properties = (NBTTagCompound)compound.getTag(EXT_PROP_NAME);
 		// Get our data from the custom tag compound
 		this.miningSkill = properties.getInteger("miningSkill");
+		this.herbalismSkill = properties.getInteger("herbalismSkill");
+		this.jewelcraftingSkill = properties.getInteger("jewelcraftingSkill");
+
 		player.getDataWatcher().updateObject(MINING_WATCHER, this.miningSkill);
+		player.getDataWatcher().updateObject(HERBALISM_WATCHER, this.herbalismSkill);
+		player.getDataWatcher().updateObject(JEWELCRAFTING_WATCHER, this.jewelcraftingSkill);
 	}
 
 	public boolean isServerSide()
@@ -120,7 +143,17 @@ public class WomPlayerData implements IExtendedEntityProperties
 
 	public boolean getHasMining()
 	{
-		return this.miningSkill == 1;
+		return this.miningSkill >= 1;
+	}
+
+	public boolean getHasHerbalism()
+	{
+		return this.getHerbalismSkill() >= 1;
+	}
+
+	public boolean getHasJewelcrafting()
+	{
+		return this.getJewelcraftingSkill() >= 1;
 	}
 
 	public final int getMiningSkill()
@@ -132,6 +165,16 @@ public class WomPlayerData implements IExtendedEntityProperties
 	{
 		player.getDataWatcher().updateObject(MINING_WATCHER, amount > 0 ? (amount < MINING_MAX_VALUE ? amount : MINING_MAX_VALUE) : 0);
 	}
+
+	public final int getHerbalismSkill()
+	{
+		return player.getDataWatcher().getWatchableObjectInt(HERBALISM_WATCHER);
+	}
+
+	public final int getJewelcraftingSkill()
+	{
+		return player.getDataWatcher().getWatchableObjectInt(JEWELCRAFTING_WATCHER);
+	}
 	
 	public void incMiningSkill(int amount)
 	{
@@ -142,6 +185,30 @@ public class WomPlayerData implements IExtendedEntityProperties
 		else
 		{
 			player.getDataWatcher().updateObject(MINING_WATCHER, MINING_MAX_VALUE);
+		}
+	}
+
+	public void incHerbalismSkill(int amount)
+	{
+		if(player.getDataWatcher().getWatchableObjectInt(HERBALISM_WATCHER) + amount <= this.MINING_MAX_VALUE)
+		{
+			player.getDataWatcher().updateObject(HERBALISM_WATCHER, player.getDataWatcher().getWatchableObjectInt(HERBALISM_WATCHER) + amount);
+		}
+		else
+		{
+			player.getDataWatcher().updateObject(HERBALISM_WATCHER, HERBALISM_MAX_VALUE);
+		}
+	}
+
+	public void incJewelcraftingSkill(int amount)
+	{
+		if(player.getDataWatcher().getWatchableObjectInt(JEWELCRAFTING_WATCHER) + amount <= this.JEWELCRAFTING_MAX_VALUE)
+		{
+			player.getDataWatcher().updateObject(JEWELCRAFTING_WATCHER, player.getDataWatcher().getWatchableObjectInt(JEWELCRAFTING_WATCHER) + amount);
+		}
+		else
+		{
+			player.getDataWatcher().updateObject(JEWELCRAFTING_WATCHER, JEWELCRAFTING_MAX_VALUE);
 		}
 	}
 }

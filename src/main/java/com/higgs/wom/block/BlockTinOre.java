@@ -16,7 +16,7 @@ public class BlockTinOre extends WomOre
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockTinOre");
 		setCreativeTab(HiggsWom.tabWom);
-		this.miningLevel = 50;
+        this.levels = new int[]{50, 90, 115, 165};
 	}
 	
 	@Override

@@ -16,7 +16,7 @@ public class BlockCopperOre extends WomOre
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockCopperOre");
 		setCreativeTab(HiggsWom.tabWom);
-		this.miningLevel = 1;
+		this.levels = new int[]{1, 25, 50, 100};
 	}
 	
 	@Override

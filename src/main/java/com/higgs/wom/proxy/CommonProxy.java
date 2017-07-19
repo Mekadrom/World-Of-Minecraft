@@ -1,9 +1,11 @@
 package com.higgs.wom.proxy;
 
 import com.higgs.wom.block.WomBlocks;
+import com.higgs.wom.event.WomEventHandlerCommon;
 import com.higgs.wom.item.WomItems;
 import com.higgs.wom.world.WomFlowerGen;
 import com.higgs.wom.world.WomOreGen;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -12,14 +14,18 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
 
 public class CommonProxy
 {
+	public static WomEventHandlerCommon eventHandlerCommon;
+
 	public void preInit(FMLPreInitializationEvent e)
 	{
+		eventHandlerCommon = new WomEventHandlerCommon();
 		WomItems.init();
 		WomBlocks.init();
     }
@@ -65,16 +71,10 @@ public class CommonProxy
     	GameRegistry.addShapelessRecipe(new ItemStack(WomItems.itemThoriumNugget, 9), WomItems.itemThoriumBar);
     	GameRegistry.addShapelessRecipe(new ItemStack(WomItems.itemTruesilverNugget, 9), WomItems.itemTruesilverBar);
     	GameRegistry.addShapelessRecipe(new ItemStack(WomItems.itemDarkIronNugget, 9), WomItems.itemDarkIronBar);
-    	
-    	GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemCopperNugget);
-    	GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemTinNugget);
-    	GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemSilverNugget);
-    	GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemMithrilNugget);
-    	GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemThoriumNugget);
-    	GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemTruesilverNugget);
-    	GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemDarkIronNugget);
-    	
-    	genGunpowderRecipes();    	
+
+
+    	genShapedRecipes();
+    	genGunpowderRecipes();
     	genBronzeRecipes(bronzes, coppers, tins);
     	
     	for(int i = 0; i < platinums.size(); i++)
@@ -82,6 +82,8 @@ public class CommonProxy
     		GameRegistry.addShapelessRecipe(new ItemStack(WomItems.itemMithrilBar), phillyStone, platinums.get(i));
     	}
 
+		FMLCommonHandler.instance().bus().register(eventHandlerCommon);
+		MinecraftForge.EVENT_BUS.register(eventHandlerCommon);
         initWorldGens();
     	initSmeltingRecipes();
     }
@@ -142,14 +144,37 @@ public class CommonProxy
     {
     	GameRegistry.addShapelessRecipe(new ItemStack(Items.gunpowder, 1), new Object[]
     			{
-    					WomItems.itemRoughBlastingPowder, WomItems.itemRoughBlastingPowder,
-    					WomItems.itemCoarseBlastingPowder, WomItems.itemCoarseBlastingPowder
+					WomItems.itemRoughBlastingPowder, WomItems.itemRoughBlastingPowder,
+					WomItems.itemCoarseBlastingPowder, WomItems.itemCoarseBlastingPowder
     			});
     	
     	GameRegistry.addShapelessRecipe(new ItemStack(Items.gunpowder, 2), new Object[]
     			{
-    					WomItems.itemSolidBlastingPowder, WomItems.itemSolidBlastingPowder,
-    					WomItems.itemDenseBlastingPowder, WomItems.itemDenseBlastingPowder
+					WomItems.itemSolidBlastingPowder, WomItems.itemSolidBlastingPowder,
+					WomItems.itemDenseBlastingPowder, WomItems.itemDenseBlastingPowder
     			});
     }
+
+    private void genShapedRecipes()
+	{
+		GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemCopperNugget);
+		GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemTinNugget);
+		GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemSilverNugget);
+		GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemMithrilNugget);
+		GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemThoriumNugget);
+		GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemTruesilverNugget);
+		GameRegistry.addShapedRecipe(new ItemStack(WomItems.itemCopperBar), "###", "###", "###", '#', WomItems.itemDarkIronNugget);
+		GameRegistry.addShapedRecipe(new ItemStack(WomBlocks.TESTBLOCK), new Object[]
+				{
+					"&%&",
+					"#$@",
+					"&*&",
+					'&', WomItems.itemInertStone,
+					'%', Items.diamond_pickaxe,
+					'#', Items.iron_pickaxe,
+					'$', WomItems.itemMossAgateGem,
+					'@', Items.golden_pickaxe,
+					'*', Items.stone_pickaxe
+				});
+	}
 }

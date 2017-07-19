@@ -1,23 +1,19 @@
 package com.higgs.wom.client.gui;
 
 import com.higgs.wom.entitydata.WomPlayerData;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.inventory.Container;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-@SideOnly(Side.CLIENT)
-public abstract class WomGuiWindow extends GuiScreen
+public /*abstract*/ class WomGuiWindow extends GuiContainer
 {
-    protected static final ResourceLocation field_147001_a = new ResourceLocation("textures/gui/container/inventory.png");
     /** The X size of the window in pixels. */
-    protected int xSize;
+    public int xSize;
     /** The Y size of the window in pixels. */
     protected int ySize;
     /** Starting X position for the Gui. Inconsistent use for Gui backgrounds. */
@@ -34,15 +30,20 @@ public abstract class WomGuiWindow extends GuiScreen
     protected int lastDragY;
     protected boolean dragging;
     protected boolean closeButtonDepressed = false;
-    protected int scrollY;
-    protected int scrollIncrement = 13;
 
     protected EntityPlayer player;
     protected WomPlayerData playerData;
 
     protected String title;
 
-    private static final String __OBFID = "CL_00000737";
+    public EnumWindowType enumWindowType;
+
+    private static final String __OBFID = "CL_11110000"; //00000737
+
+    public WomGuiWindow(Container container)
+    {
+        super(container);
+    }
 
     /**
      * Adds the buttons (and other controls) to the screen in question.
@@ -56,6 +57,21 @@ public abstract class WomGuiWindow extends GuiScreen
 //        this.buttonList.add(new WomGuiCloseButton(this, 1, displayX + this.width - 14, displayY + 5, ""));
     }
 
+    protected int getGuiX()
+    {
+        return displayX + dragX;
+    }
+
+    protected int getGuiY()
+    {
+        return displayY + dragY;
+    }
+
+    public enum EnumWindowType
+    {
+        PROFESSION_MINING, PROFESSION_HERBALISM, PROFESSION_JEWELCRAFTING, INVENTORY
+    }
+
     public EntityPlayer getPlayer()
     {
         return this.player;
@@ -64,12 +80,6 @@ public abstract class WomGuiWindow extends GuiScreen
     public WomPlayerData getPlayerData()
     {
         return this.playerData;
-    }
-
-    public void windowDragged(int x, int y)
-    {
-        dragX = x - lastDragX;
-        dragY = y - lastDragY;
     }
 
     /**
@@ -107,25 +117,43 @@ public abstract class WomGuiWindow extends GuiScreen
     /**
      * Draw the foreground layer for the GuiContainer (everything in front of the items)
      */
-    protected void drawGuiContainerForegroundLayer(int x, int y) {}
 
-    protected abstract void drawGuiContainerBackgroundLayer(float depth, int x, int y);
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
+    {
+
+    }
+
+    protected void drawGuiContainerBackgroundLayer(float depth, int mouseX, int mouseY)
+    {
+        if(dragging)
+        {
+            windowDragged(mouseX, mouseY);
+        }
+    }
+
+    public void windowDragged(int x, int y)
+    {
+        dragX = x - lastDragX;
+        dragY = y - lastDragY;
+    }
 
     /**
      * Called when the mouse is clicked.
      */
-    protected void mouseClicked(int x, int y, int z)
+    @Override
+    protected void mouseClicked(int x, int y, int button)
     {
-        super.mouseClicked(x, y, z);
+        super.mouseClicked(x, y, button);
     }
 
     /**
      * Called when a mouse button is pressed and the mouse is moved around. Parameters are : mouseX, mouseY,
      * lastButtonClicked & timeSinceMouseClick.
      */
+    @Override
     protected void mouseClickMove(int mouseX, int mouseY, int lastButtonClicked, long timeSinceMouseClick)
     {
-
+        super.mouseClickMove(mouseX, mouseY, lastButtonClicked, timeSinceMouseClick);
     }
 
     /**
@@ -135,27 +163,15 @@ public abstract class WomGuiWindow extends GuiScreen
     protected void mouseMovedOrUp(int mouseX, int mouseY, int which)
     {
         super.mouseMovedOrUp(mouseX, mouseY, which); //Forge, Call parent to release buttons
-
-        if(which == 0)
-        {
-            dragging = false;
-        }
-    }
-
-    protected void handleMouseClick(WomGuiListItem womGuiListItem, int slotNumber, int x, int y)
-    {
-
     }
 
     /**
      * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
      */
+    @Override
     protected void keyTyped(char charId, int keyId)
     {
-        if(keyId == 1 || keyId == this.mc.gameSettings.keyBindInventory.getKeyCode())
-        {
-            this.mc.thePlayer.closeScreen();
-        }
+        super.keyTyped(charId, keyId);
     }
 
     /**
@@ -174,6 +190,11 @@ public abstract class WomGuiWindow extends GuiScreen
         return false;
     }
 
+    protected static boolean isInRect(int x, int y, int xSize, int ySize, int mouseX, int mouseY)
+    {
+        return ((mouseX >= x && mouseX <= x + xSize) && (mouseY >= y && mouseY <= y + ySize));
+    }
+
     /**
      * Called from the main game loop to update the screen.
      */
@@ -185,11 +206,6 @@ public abstract class WomGuiWindow extends GuiScreen
         {
             this.mc.thePlayer.closeScreen();
         }
-    }
-
-    public int getScrollY()
-    {
-        return scrollY;
     }
 
     /**

@@ -16,7 +16,7 @@ public class BlockFelIronOre extends WomOre
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockFelIronOre");
 		setCreativeTab(HiggsWom.tabWom);
-		this.miningLevel = 275;
+        this.levels = new int[]{275, 325, 350, 400};
 	}
 	
 	@Override

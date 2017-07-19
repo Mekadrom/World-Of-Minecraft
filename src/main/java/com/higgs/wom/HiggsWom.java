@@ -1,9 +1,8 @@
 package com.higgs.wom;
 
-import com.higgs.wom.event.WomEventHandlerCommon;
 import com.higgs.wom.item.WomItems;
 import com.higgs.wom.network.PacketDispatcher;
-import com.higgs.wom.network.WomGuiHandler;
+import com.higgs.wom.client.gui.WomGuiHandler;
 import com.higgs.wom.proxy.CommonProxy;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
@@ -19,7 +18,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.Level;
@@ -33,7 +31,7 @@ public class HiggsWom
 {
     public static final String MODID = "wom";
     public static final String MODNAME = "Higgs' World of Minecraft";
-    public static final String VERSION = "2.0.0";
+    public static final String VERSION = "2.0.1";
     
     public static Configuration config;
     
@@ -105,6 +103,9 @@ public class HiggsWom
     public static float denseBlastingPowderStrength;
 
     public static boolean harvestingOreOpensGui;
+    public static boolean minersPickEquippedRequired;
+
+    public static int[] keyValues = new int[5];
 
     @SidedProxy(clientSide="com.higgs.wom.proxy.ClientProxy", serverSide="com.higgs.wom.proxy.CommonProxy")
 	public static CommonProxy proxy;
@@ -133,23 +134,8 @@ public class HiggsWom
     @EventHandler
     public void init(FMLInitializationEvent e)
     {
-        ArrayList<WomRecipe> recipes = new ArrayList<WomRecipe>();
+        addRecipes();
 
-        WomRecipe recipe1 = new WomRecipe(new ItemStack(WomItems.itemCopperBar, 1), new int[]{1, 20, 40, 60}, WomRecipe.EnumRecipe.MINING, "Smelt Copper");
-        WomRecipe recipe2 = new WomRecipe(new ItemStack(WomItems.itemTinBar, 1), new int[]{45, 50, 57, 75}, WomRecipe.EnumRecipe.MINING, "Smelt Tin");
-
-        recipe1.addIngredients(new WomItemStack(new ItemStack(WomItems.itemCopperOre, 1)));
-        recipe2.addIngredients(new WomItemStack(new ItemStack(WomItems.itemTinOre, 1)));
-
-        recipes.add(recipe1);
-        recipes.add(recipe2);
-
-        for(WomRecipe r : recipes)
-        {
-            WomRecipe.addRecipe(r);
-        }
-
-        MinecraftForge.EVENT_BUS.register(new WomEventHandlerCommon());
         NetworkRegistry.INSTANCE.registerGuiHandler(HiggsWom.instance, new WomGuiHandler());
 
         proxy.init(e);
@@ -228,7 +214,11 @@ public class HiggsWom
             Property denseBlastingPowderStrengthProp = config.get("blastingpowder", "oreDarkIronVeinMaxY", "0.75", "determines the strength of dense blasting powder.");
             
             Property harvestingOreOpensGuiProp = config.get("miscellaneous", "harvestingOreOpensGui", "false", "toggles whether harvesting ores opens an inventory with the contents instead of dropping them.");
-            
+            Property minersPickEquippedRequiredProp = config.get("miscellaneous", "minersPickEquippedRequired", "true", "toggles whether or not the player must have the miner's pick in their hand to harvest");
+
+            Property miningProfessionGuiKeyProp = config.get("keybinds", "miningProfessionGuiKey", "79", "keybind to open the mining profession gui (default: NUMPAD_1).");
+            Property inventoryGuiKeyProp = config.get("keybinds", "inventoryGuiKey", "23", "keybind to open the mining profession gui (default: NUMPAD_1).");
+
             verboseOutput = verboseOutputProp.getBoolean();
 
             oreCopperVeinSpawns = oreCopperVeinSpawnsProp.getBoolean();
@@ -288,6 +278,10 @@ public class HiggsWom
             denseBlastingPowderStrength = Float.parseFloat(denseBlastingPowderStrengthProp.getString());
 
             harvestingOreOpensGui = harvestingOreOpensGuiProp.getBoolean();
+            minersPickEquippedRequired = minersPickEquippedRequiredProp.getBoolean();
+
+            keyValues[0] = miningProfessionGuiKeyProp.getInt();
+            keyValues[1] = inventoryGuiKeyProp.getInt();
 
             if(verboseOutput)
             {
@@ -314,6 +308,40 @@ public class HiggsWom
             	config.save();
             }
         }
+    }
+
+    public void addRecipes()
+    {
+        ArrayList<WomRecipe> recipes = new ArrayList<WomRecipe>();
+
+        WomRecipe copper = new WomRecipe(new ItemStack(WomItems.itemCopperBar, 1), new int[]{1, 20, 40, 60}, WomRecipe.EnumRecipe.MINING, "Smelt Copper");
+        WomRecipe tin = new WomRecipe(new ItemStack(WomItems.itemTinBar, 1), new int[]{45, 50, 57, 75}, WomRecipe.EnumRecipe.MINING, "Smelt Tin");
+        WomRecipe silver = new WomRecipe(new ItemStack(WomItems.itemSilverBar, 1), new int[]{65, 100, 105, 110}, WomRecipe.EnumRecipe.MINING, "Smelt Silver");
+        WomRecipe mithril = new WomRecipe(new ItemStack(WomItems.itemMithrilBar, 1), new int[]{150, 150, 175, 200}, WomRecipe.EnumRecipe.MINING, "Smelt Mithril");
+        WomRecipe thorium = new WomRecipe(new ItemStack(WomItems.itemThoriumBar), new int[]{225, 230, 245, 290}, WomRecipe.EnumRecipe.MINING, "Smelt Thorium");
+        WomRecipe truesilver = new WomRecipe(new ItemStack(WomItems.itemTruesilverBar), new int[]{165, 200, 205, 210}, WomRecipe.EnumRecipe.MINING, "Smelt Truesilver");
+        WomRecipe darkiron = new WomRecipe(new ItemStack(WomItems.itemDarkIronBar), new int[]{230, 300, 305, 310}, WomRecipe.EnumRecipe.MINING, "Smelt Dark Iron");
+        WomRecipe feliron = new WomRecipe(new ItemStack(WomItems.itemFelIronBar), new int[]{275, 275, 300, 325}, WomRecipe.EnumRecipe.MINING, "Smelt Fel Iron");
+
+        copper.addIngredients(new WomItemStack(new ItemStack(WomItems.itemCopperOre, 1)));
+        tin.addIngredients(new WomItemStack(new ItemStack(WomItems.itemTinOre, 1)));
+        silver.addIngredients(new WomItemStack(new ItemStack(WomItems.itemSilverOre, 1)));
+        mithril.addIngredients(new WomItemStack(new ItemStack(WomItems.itemMithrilOre, 1)));
+        thorium.addIngredients(new WomItemStack(new ItemStack(WomItems.itemThoriumOre, 1)));
+        truesilver.addIngredients(new WomItemStack(new ItemStack(WomItems.itemTruesilverOre, 1)));
+        darkiron.addIngredients(new WomItemStack(new ItemStack(WomItems.itemDarkIronOre, 8)));
+        feliron.addIngredients(new WomItemStack(new ItemStack(WomItems.itemFelIronOre, 2)));
+
+        recipes.add(copper);
+        recipes.add(tin);
+        recipes.add(silver);
+        recipes.add(mithril);
+        recipes.add(thorium);
+        recipes.add(truesilver);
+        recipes.add(darkiron);
+        recipes.add(feliron);
+
+        WomRecipe.addRecipes(recipes);
     }
 
     public static CreativeTabs tabWom = new CreativeTabs("tabWom")

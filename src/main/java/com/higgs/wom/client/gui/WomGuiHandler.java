@@ -1,11 +1,11 @@
-package com.higgs.wom.network;
+package com.higgs.wom.client.gui;
 
 import com.higgs.wom.block.WomOre;
-import com.higgs.wom.client.gui.WomGuiLoot;
-import com.higgs.wom.client.gui.WomGuiMiningSkill;
+import com.higgs.wom.guicontainer.WomContainerDefault;
+import com.higgs.wom.guicontainer.WomContainerInventory;
 import com.higgs.wom.guicontainer.WomContainerLoot;
-import com.higgs.wom.guicontainer.WomContainerProfessions;
 import com.higgs.wom.inventory.WomOreInventory;
+import com.higgs.wom.proxy.ClientProxy;
 import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,6 +15,7 @@ public class WomGuiHandler implements IGuiHandler
 {
     public static final int WOM_LOOT_GUI = 0;
     public static final int WOM_MINING_SKILL_GUI = 1;
+    public static final int WOM_INVENTORY_GUI = 2;
 
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
@@ -30,7 +31,11 @@ public class WomGuiHandler implements IGuiHandler
         }
         else if(ID == WOM_MINING_SKILL_GUI)
         {
-            return new WomContainerProfessions();
+            return new WomContainerDefault();
+        }
+        else if(ID == WOM_INVENTORY_GUI)
+        {
+            return new WomContainerInventory(player.inventory, !world.isRemote, player);
         }
 
         return null;
@@ -51,7 +56,17 @@ public class WomGuiHandler implements IGuiHandler
         }
         else if(ID == WOM_MINING_SKILL_GUI)
         {
-            return new WomGuiMiningSkill(player);
+            ClientProxy.playerGui.setPlayer(player);
+            ClientProxy.playerGui.openWindow(new WomGuiMiningSkill(player, new WomContainerDefault()));
+            return ClientProxy.playerGui;
+            //return new WomGuiMiningSkill(player);
+        }
+        else if(ID == WOM_INVENTORY_GUI)
+        {
+            ClientProxy.playerGui.setPlayer(player);
+            ClientProxy.playerGui.openWindow(new WomGuiInventory(player.inventory, player, new WomContainerInventory(player.inventory, !world.isRemote, player)));
+            return ClientProxy.playerGui;
+            //return new WomGuiInventory(player);
         }
 
         return null;

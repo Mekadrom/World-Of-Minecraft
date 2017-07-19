@@ -16,7 +16,7 @@ public class BlockMithrilOre extends WomOre
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockMithrilOre");
 		setCreativeTab(HiggsWom.tabWom);
-		this.miningLevel = 175;
+        this.levels = new int[]{175, 200, 225, 275};
 	}
 	
 	@Override

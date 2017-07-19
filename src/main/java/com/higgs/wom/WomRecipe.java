@@ -95,6 +95,14 @@ public class WomRecipe
         recipeRegistry.add(newRecipe);
     }
 
+    public static void addRecipes(ArrayList<WomRecipe> toAdd)
+    {
+        for(WomRecipe recipe : toAdd)
+        {
+            addRecipe(recipe);
+        }
+    }
+
     public static ArrayList<WomRecipe> getRecipes(EnumRecipe type)
     {
         ArrayList<WomRecipe> result = new ArrayList<WomRecipe>();

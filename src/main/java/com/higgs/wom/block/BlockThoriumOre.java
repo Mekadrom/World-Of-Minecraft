@@ -17,7 +17,7 @@ public class BlockThoriumOre extends WomOre
 		setBlockName(unlocalizedName);
 		setBlockTextureName(HiggsWom.MODID + ":blockThoriumOre");
 		setCreativeTab(HiggsWom.tabWom);
-		this.miningLevel = 230;
+        this.levels = new int[]{230, 270, 280, 345};
 	}
 	
 	@Override
