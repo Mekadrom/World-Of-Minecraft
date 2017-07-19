@@ -322,6 +322,7 @@ public class HiggsWom
         WomRecipe truesilver = new WomRecipe(new ItemStack(WomItems.itemTruesilverBar), new int[]{165, 200, 205, 210}, WomRecipe.EnumRecipe.MINING, "Smelt Truesilver");
         WomRecipe darkiron = new WomRecipe(new ItemStack(WomItems.itemDarkIronBar), new int[]{230, 300, 305, 310}, WomRecipe.EnumRecipe.MINING, "Smelt Dark Iron");
         WomRecipe feliron = new WomRecipe(new ItemStack(WomItems.itemFelIronBar), new int[]{275, 275, 300, 325}, WomRecipe.EnumRecipe.MINING, "Smelt Fel Iron");
+        WomRecipe eternium = new WomRecipe(new ItemStack(WomItems.itemEterniumBar), new int[]{350, 350, 357, 365}, WomRecipe.EnumRecipe.MINING, "Smelt Eternium Ore");
 
         copper.addIngredients(new WomItemStack(new ItemStack(WomItems.itemCopperOre, 1)));
         tin.addIngredients(new WomItemStack(new ItemStack(WomItems.itemTinOre, 1)));

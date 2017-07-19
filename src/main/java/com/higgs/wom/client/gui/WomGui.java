@@ -100,7 +100,6 @@ public class WomGui extends GuiScreen
     @Override
     public void drawScreen(int x, int y, float depth)
     {
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         if(openWindows.isEmpty())
         {
             player.closeScreen();

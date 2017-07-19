@@ -1,6 +1,7 @@
 package com.higgs.wom.client.gui;
 
 import com.higgs.wom.HiggsWom;
+import com.higgs.wom.proxy.ClientProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -24,7 +25,7 @@ public class WomGuiInventory extends WomGuiWindow
         this.player = player;
         this.mc = Minecraft.getMinecraft();
         this.fontRendererObj = Minecraft.getMinecraft().fontRenderer;
-        this.enumWindowType = WomGuiWindow.EnumWindowType.INVENTORY;
+        this.enumWindowType = EnumWindowType.INVENTORY;
         displayX = (mc.displayWidth / 2) - 100;
         displayY = (mc.displayHeight / 2) - 177;
 
@@ -57,16 +58,16 @@ public class WomGuiInventory extends WomGuiWindow
 
         GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         fontRendererObj.drawString("Inventory", getGuiX() + 23, getGuiY() + 3, 0xffffff, true);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
         this.mc.getTextureManager().bindTexture(new ResourceLocation(HiggsWom.MODID + ":textures/gui/guiWindowElements.png"));
 
         if(this.closeButtonDepressed)
         {
-            drawTexturedModalRect(getGuiX() + (82), getGuiY() + (4), 49, 64, 8, 8);
+            drawTexturedModalRect(getGuiX() + (83), getGuiY() + (4), 49, 64, 8, 8);
         }
         else
         {
-            drawTexturedModalRect(getGuiX() + (82), getGuiY() + (4), 49, 64, 8, 8);
+            drawTexturedModalRect(getGuiX() + (83), getGuiY() + (4), 49, 64, 8, 8);
         }
     }
 
@@ -118,13 +119,23 @@ public class WomGuiInventory extends WomGuiWindow
      * Called when the mouse is moved or a mouse button is released.  Signature: (mouseX, mouseY, which) which==-1 is
      * mouseMove, which==0 or which==1 is mouseUp
      */
+    @Override
     protected void mouseMovedOrUp(int mouseX, int mouseY, int which)
     {
         super.mouseMovedOrUp(mouseX, mouseY, which); //Forge, Call parent to release buttons
+
+        if(which == 0)
+        {
+            if(isInXButtonArea(mouseX, mouseY))
+            {
+                ClientProxy.playerGui.closeWindow(this);
+                this.closeButtonDepressed = false;
+            }
+        }
     }
 
     private boolean isInXButtonArea(int mouseX, int mouseY)
     {
-        return isInRect(82, 4, 8, 8, mouseX, mouseY);
+        return isInRect(getGuiX() + 83, getGuiY() + 4, 8, 8, mouseX, mouseY);
     }
 }
